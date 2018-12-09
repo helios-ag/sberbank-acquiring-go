@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	ApiUri        string = "https://securepayments.sberbank.ru"
-	ApiSandboxUri string = "https://3dsec.sberbank.ru"
+	APIURI        string = "https://securepayments.sberbank.ru"
+	APISandboxURI string = "https://3dsec.sberbank.ru"
 )
 
 type ClientConfig struct {
@@ -63,10 +63,10 @@ func WithEndpoint(endpoint string) ClientOption {
 }
 
 func (c *Client) NewRestRequest(ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error) {
-	uri := ApiUri + urlPath
+	uri := APIURI + urlPath
 
 	if c.Config.SandboxMode {
-		uri = ApiSandboxUri + urlPath
+		uri = APISandboxURI + urlPath
 	}
 
 	if c.Config.endpoint != "" {
@@ -108,10 +108,10 @@ func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data in
 		return nil, fmt.Errorf("path contains rest request, use NewRestRequest instead")
 	}
 
-	uri := ApiUri + urlPath
+	uri := APIURI + urlPath
 
 	if c.Config.SandboxMode {
-		uri = ApiSandboxUri + urlPath
+		uri = APISandboxURI + urlPath
 	}
 
 	if c.Config.endpoint != "" {

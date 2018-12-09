@@ -51,7 +51,7 @@ func TestRegisterOrder(t *testing.T) {
 			OrderNumber: "123",
 			Amount:      100,
 			Description: "Test",
-			ReturnUrl:   "wrong\\localhost:6379",
+			ReturnURL:   "wrong\\localhost:6379",
 		}
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
@@ -66,7 +66,7 @@ func TestRegisterOrder(t *testing.T) {
 			OrderNumber: "1234567890123456789012345678901",
 			Amount:      100,
 			Description: "Test",
-			ReturnUrl:   "https://api-sberbank",
+			ReturnURL:   "https://api-sberbank",
 		}
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
@@ -81,8 +81,8 @@ func TestRegisterOrder(t *testing.T) {
 			OrderNumber: "1234567890123456",
 			Amount:      100,
 			Description: "Test",
-			ReturnUrl:   "https://api-sberbank",
-			FailUrl:     "wrong\\localhost:6379",
+			ReturnURL:   "https://api-sberbank",
+			FailURL:     "wrong\\localhost:6379",
 		}
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
@@ -107,7 +107,7 @@ func TestRegisterOrder(t *testing.T) {
 			OrderNumber: "1234567890123456",
 			Amount:      100,
 			Description: "Test",
-			ReturnUrl:   "https://localhost",
+			ReturnURL:   "https://localhost",
 		}
 
 		response, _, err := server.Client.RegisterOrder(context.Background(), order)
@@ -144,7 +144,7 @@ func TestRegisterPreAuthOrder(t *testing.T) {
 			OrderNumber: "123",
 			Amount:      100,
 			Description: "Test",
-			ReturnUrl:   "wrong\\localhost:6379",
+			ReturnURL:   "wrong\\localhost:6379",
 		}
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
@@ -159,7 +159,7 @@ func TestRegisterPreAuthOrder(t *testing.T) {
 			OrderNumber: "1234567890123456789012345678901",
 			Amount:      100,
 			Description: "Test",
-			ReturnUrl:   "https://api-sberbank",
+			ReturnURL:   "https://api-sberbank",
 		}
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
@@ -174,8 +174,8 @@ func TestRegisterPreAuthOrder(t *testing.T) {
 			OrderNumber: "1234567890123456",
 			Amount:      100,
 			Description: "Test",
-			ReturnUrl:   "https://api-sberbank",
-			FailUrl:     "wrong\\localhost:6379",
+			ReturnURL:   "https://api-sberbank",
+			FailURL:     "wrong\\localhost:6379",
 		}
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
@@ -200,7 +200,7 @@ func TestRegisterPreAuthOrder(t *testing.T) {
 			OrderNumber: "1234567890123456",
 			Amount:      100,
 			Description: "Test",
-			ReturnUrl:   "https://localhost",
+			ReturnURL:   "https://localhost",
 		}
 
 		response, _, err := server.Client.RegisterOrderPreAuth(context.Background(), order)
@@ -368,17 +368,13 @@ func TestEnrollment(t *testing.T) {
 	t.Run("Validate Enrollment PAN", func(t *testing.T) {
 		client, _ := prepareClient()
 
-		enrollment := Enrollment{
-			pan: "4111111111111111111111111",
-		}
+		enrollment := "4111111111111111111111111"
 
 		_, _, err := client.VerifyEnrollment(context.Background(), enrollment)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("pan length shouldn't be less 13 or more 19 symbols"))
 
-		enrollment = Enrollment{
-			pan: "411111111111",
-		}
+		enrollment = "411111111111"
 
 	})
 
@@ -397,9 +393,7 @@ func TestEnrollment(t *testing.T) {
 			})
 		})
 
-		enrollment := Enrollment{
-			pan: "4111111111111111",
-		}
+		enrollment := "4111111111111111"
 
 		response, _, err := server.Client.VerifyEnrollment(context.Background(), enrollment)
 		Expect(err).ToNot(HaveOccurred())
@@ -417,7 +411,7 @@ func TestBindingCard(t *testing.T) {
 		client, _ := prepareClient()
 
 		binding := Binding{
-			bindingId: "",
+			bindingID: "",
 		}
 
 		_, _, err := client.BindCard(context.Background(), binding)
@@ -429,7 +423,7 @@ func TestBindingCard(t *testing.T) {
 		client, _ := prepareClient()
 
 		binding := Binding{
-			bindingId: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
 		}
 
 		_, _, err := client.ExtendBinding(context.Background(), binding)
@@ -460,7 +454,7 @@ func TestBindingCard(t *testing.T) {
 		})
 
 		binding := Binding{
-			bindingId: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
 		}
 
 		response, _, err := server.Client.BindCard(context.Background(), binding)
@@ -509,7 +503,7 @@ func TestReceiptStatus(t *testing.T) {
 		})
 
 		binding := Binding{
-			bindingId: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
 		}
 
 		response, _, err := server.Client.BindCard(context.Background(), binding)
