@@ -42,33 +42,33 @@ type ApplePaymentResponse struct {
 		TerminalID string `json:"terminalId"`
 	} `json:"orderStatus"`
 	Success bool `json:"success"`
-	Error struct {
-		Code string `json:"code"`
+	Error   struct {
+		Code        string `json:"code"`
 		Description string `json:"description"`
-		Message string `json:"message"`
+		Message     string `json:"message"`
 	} `json:"error,omitempty"`
 }
 
 type SamsungPaymentResponse struct {
 	Success bool `json:"success"`
-	Data struct {
+	Data    struct {
 		OrderID string `json:"orderId,omitempty"`
 	} `json:"data"`
 	Error struct {
-		Code int `json:"code"`
+		Code        int    `json:"code"`
 		Description string `json:"description"`
-		Message string `json:"message"`
+		Message     string `json:"message"`
 	} `json:"error,omitempty"`
 }
 
 type GooglePaymentResponse struct {
 	Success bool `json:"success"`
-	Data struct {
+	Data    struct {
 		OrderID string `json:"orderId,omitempty"`
 	} `json:"data"`
 	Error struct {
-		Code int `json:"code"`
+		Code        int    `json:"code"`
 		Description string `json:"description"`
-		Message string `json:"message"`
+		Message     string `json:"message"`
 	} `json:"error,omitempty"`
 }

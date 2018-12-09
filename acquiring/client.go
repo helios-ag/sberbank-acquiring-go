@@ -44,7 +44,6 @@ type Body struct {
 	Currency           *string `json:"currency"`
 	SessionTimeoutSecs *int    `json:"sessionTimeoutSecs"`
 	JsonParams         []byte  `json:"jsonParams"`
-
 }
 
 type ClientOption func(*Client)
@@ -63,7 +62,7 @@ func WithEndpoint(endpoint string) ClientOption {
 	}
 }
 
-func (c* Client) NewRestRequest(ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error) {
+func (c *Client) NewRestRequest(ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error) {
 	uri := ApiUri + urlPath
 
 	if c.Config.SandboxMode {
@@ -104,7 +103,7 @@ func (c* Client) NewRestRequest(ctx context.Context, method, urlPath string, dat
 	return req, nil
 }
 
-func (c* Client) NewRequest(ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error) {
 	if strings.Contains(urlPath, "rest") {
 		return nil, fmt.Errorf("path contains rest request, use NewRestRequest instead")
 	}
@@ -118,7 +117,6 @@ func (c* Client) NewRequest(ctx context.Context, method, urlPath string, data in
 	if c.Config.endpoint != "" {
 		uri = c.Config.endpoint + urlPath
 	}
-
 
 	method = "POST"
 	reqBodyData, err := json.Marshal(data)
@@ -142,35 +140,35 @@ func (c* Client) NewRequest(ctx context.Context, method, urlPath string, data in
 }
 
 func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
-		resp, err := c.httpClient.Do(r)
-		if err != nil {
-			return nil, err
-		}
+	resp, err := c.httpClient.Do(r)
+	if err != nil {
+		return nil, err
+	}
 
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			resp.Body.Close()
-			return resp, err
-		}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
 		resp.Body.Close()
-		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
-
-		if resp.StatusCode >= 400 && resp.StatusCode <= 599 {
-			err = errorFromResponse(resp, body)
-			if err == nil {
-				err = fmt.Errorf("sberbank server responded with status code %d", resp.StatusCode)
-			}
-			return resp, err
-		}
-		if v != nil {
-			if w, ok := v.(io.Writer); ok {
-				_, err = io.Copy(w, bytes.NewReader(body))
-			} else {
-				err = json.Unmarshal(body, v)
-			}
-		}
-
 		return resp, err
+	}
+	resp.Body.Close()
+	resp.Body = ioutil.NopCloser(bytes.NewReader(body))
+
+	if resp.StatusCode >= 400 && resp.StatusCode <= 599 {
+		err = errorFromResponse(resp, body)
+		if err == nil {
+			err = fmt.Errorf("sberbank server responded with status code %d", resp.StatusCode)
+		}
+		return resp, err
+	}
+	if v != nil {
+		if w, ok := v.(io.Writer); ok {
+			_, err = io.Copy(w, bytes.NewReader(body))
+		} else {
+			err = json.Unmarshal(body, v)
+		}
+	}
+
+	return resp, err
 }
 
 func errorFromResponse(resp *http.Response, body []byte) error {
@@ -220,4 +218,3 @@ func NewClient(cfg *ClientConfig, options ...ClientOption) (*Client, error) {
 
 	return client, nil
 }
-

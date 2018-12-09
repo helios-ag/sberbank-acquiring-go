@@ -64,7 +64,7 @@ func validateRegisterOrder(order Order) error {
 		}
 	}
 
-	if order.FailUrl !="" {
+	if order.FailUrl != "" {
 		if _, err := url.Parse(order.FailUrl); err != nil {
 			return fmt.Errorf("unable to parse FailUrl: %v", err)
 		}
@@ -75,16 +75,16 @@ func validateRegisterOrder(order Order) error {
 
 func (c *Client) register(ctx context.Context, path string, order Order) (*schema.OrderResponse, *http.Response, error) {
 	body := make(map[string]string)
-	body["orderNumber"]    = order.OrderNumber
-	body["amount"]         = strconv.Itoa(order.Amount)
-	body["returnUrl"]      = order.ReturnUrl
-	body["failUrl"]        = order.FailUrl
-	body["description"]    = order.Description
-	body["pageView"]       = order.PageView
-	body["merchantLogin"]  = order.MerchantLogin
+	body["orderNumber"] = order.OrderNumber
+	body["amount"] = strconv.Itoa(order.Amount)
+	body["returnUrl"] = order.ReturnUrl
+	body["failUrl"] = order.FailUrl
+	body["description"] = order.Description
+	body["pageView"] = order.PageView
+	body["merchantLogin"] = order.MerchantLogin
 	body["expirationDate"] = order.ExpirationDate
-	body["bindingId"]      = order.BindingId
-	body["features"]       = order.Features
+	body["bindingId"] = order.BindingId
+	body["features"] = order.Features
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JsonParams)
 
 	if err != nil {
@@ -92,7 +92,7 @@ func (c *Client) register(ctx context.Context, path string, order Order) (*schem
 	}
 	var orderResponse schema.OrderResponse
 	result, err := c.Do(req, &orderResponse)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&orderResponse)
@@ -112,7 +112,7 @@ func (c *Client) Deposit(ctx context.Context, order Order) (*schema.OrderRespons
 
 	body := make(map[string]string)
 	body["orderId"] = order.OrderNumber
-	body["amount"]  = strconv.Itoa(order.Amount)
+	body["amount"] = strconv.Itoa(order.Amount)
 
 	var orderResponse schema.OrderResponse
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JsonParams)
@@ -121,7 +121,7 @@ func (c *Client) Deposit(ctx context.Context, order Order) (*schema.OrderRespons
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &orderResponse)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&orderResponse)
@@ -148,7 +148,7 @@ func (c *Client) ReverseOrder(ctx context.Context, order Order) (*schema.OrderRe
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &orderResponse)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&orderResponse)
@@ -167,7 +167,7 @@ func (c *Client) RefundOrder(ctx context.Context, order Order) (*schema.OrderRes
 
 	body := make(map[string]string)
 	body["orderId"] = order.OrderNumber
-	body["refundAmount"]  = strconv.Itoa(order.Amount)
+	body["refundAmount"] = strconv.Itoa(order.Amount)
 
 	var orderResponse schema.OrderResponse
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JsonParams)
@@ -176,7 +176,7 @@ func (c *Client) RefundOrder(ctx context.Context, order Order) (*schema.OrderRes
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &orderResponse)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&orderResponse)
@@ -221,7 +221,7 @@ func (c *Client) GetOrderStatus(ctx context.Context, order Order) (*schema.Order
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &orderResponse)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&orderResponse)
@@ -246,7 +246,7 @@ func validateOrderNumber(order Order) error {
 }
 
 type Enrollment struct {
-	pan string
+	pan        string
 	jsonParams map[string]string
 }
 
@@ -267,7 +267,7 @@ func (c *Client) VerifyEnrollment(ctx context.Context, enrollment Enrollment) (*
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &enrollmentResponse)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&enrollmentResponse)
@@ -297,7 +297,7 @@ func (c *Client) UpdateSSLCardList(ctx context.Context, mdorder string, jsonPara
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &response)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&response)
@@ -366,14 +366,14 @@ func validateBind(binding Binding) error {
 }
 
 func validateExpiry(binding Binding) error {
-	if len(strconv.Itoa(binding.newExpiry)) !=6 {
+	if len(strconv.Itoa(binding.newExpiry)) != 6 {
 		return fmt.Errorf("new expiry date should have 6 digits")
 	}
 
 	return nil
 }
 
-func (c *Client) bind(ctx context.Context, path string, body map[string]string,jsonParams map[string]string) (*schema.Response, *http.Response, error) {
+func (c *Client) bind(ctx context.Context, path string, body map[string]string, jsonParams map[string]string) (*schema.Response, *http.Response, error) {
 	var response schema.Response
 	req, err := c.NewRestRequest(ctx, "GET", path, body, jsonParams)
 
@@ -381,7 +381,7 @@ func (c *Client) bind(ctx context.Context, path string, body map[string]string,j
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &response)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&response)
@@ -408,7 +408,7 @@ func (c *Client) GetBindings(ctx context.Context, clientId string, jsonParams ma
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &response)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&response)
@@ -433,9 +433,9 @@ func (c *Client) GetReceiptStatus(ctx context.Context, receiptStatusRequest Rece
 	}
 
 	body := make(map[string]string)
-	body["orderId"]     = receiptStatusRequest.OrderId
+	body["orderId"] = receiptStatusRequest.OrderId
 	body["orderNumber"] = receiptStatusRequest.OrderNumber
-	body["uuid"]        = receiptStatusRequest.UUID
+	body["uuid"] = receiptStatusRequest.UUID
 
 	var response schema.ReceiptStatus
 
@@ -445,7 +445,7 @@ func (c *Client) GetReceiptStatus(ctx context.Context, receiptStatusRequest Rece
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &response)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&response)
@@ -470,11 +470,11 @@ func validateReceiptStatusRequest(receiptStatusRequest ReceiptStatusRequest) err
 }
 
 type ApplePaymentRequest struct {
-	OrderNumber          string   `json:"orderNumber"`
-	Merchant             string   `json:"merchant"`
-	PaymentToken         string   `json:"paymentToken"`
-	Description          string   `json:"description,omitempty"`
-	PreAuth              bool     `json:"preAuth,omitempty"`
+	OrderNumber          string `json:"orderNumber"`
+	Merchant             string `json:"merchant"`
+	PaymentToken         string `json:"paymentToken"`
+	Description          string `json:"description,omitempty"`
+	PreAuth              bool   `json:"preAuth,omitempty"`
 	AdditionalParameters map[string]string
 }
 
@@ -493,7 +493,7 @@ func (c *Client) PayWithApplePay(ctx context.Context, applePaymentRequest AppleP
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &response)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&response)
@@ -511,21 +511,21 @@ func validateApplePaymentRequest(request ApplePaymentRequest) error {
 }
 
 type GooglePaymentRequest struct {
-	OrderNumber          string           `json:"orderNumber"`
-	Merchant             string           `json:"merchant"`
-	PaymentToken         string           `json:"paymentToken"`
-	Language             string           `json:"language"`
-	Description          string           `json:"description,omitempty"`
-	ClientId             string           `json:"clientId,omitempty"`
-	IP                   string           `json:"ip,omitempty"`
-	Amount               int              `json:"amount,omitempty"`
-	CurrencyCode         int              `json:"currencyCode,omitempty"`
-	Email                string           `json:"email,omitempty"`
-	Phone                string           `json:"phone,omitempty"`
-	ReturnUrl            string           `json:"returnUrl"`
-	FailUrl              string           `json:"failUrl,omitempty"`
-	PreAuth              bool             `json:"preAuth,omitempty"`
-	AdditionalParameters map[string]string`json:"additionalParameters"`
+	OrderNumber          string            `json:"orderNumber"`
+	Merchant             string            `json:"merchant"`
+	PaymentToken         string            `json:"paymentToken"`
+	Language             string            `json:"language"`
+	Description          string            `json:"description,omitempty"`
+	ClientId             string            `json:"clientId,omitempty"`
+	IP                   string            `json:"ip,omitempty"`
+	Amount               int               `json:"amount,omitempty"`
+	CurrencyCode         int               `json:"currencyCode,omitempty"`
+	Email                string            `json:"email,omitempty"`
+	Phone                string            `json:"phone,omitempty"`
+	ReturnUrl            string            `json:"returnUrl"`
+	FailUrl              string            `json:"failUrl,omitempty"`
+	PreAuth              bool              `json:"preAuth,omitempty"`
+	AdditionalParameters map[string]string `json:"additionalParameters"`
 }
 
 func (c *Client) PayWithGooglePay(ctx context.Context, googlePaymentRequest GooglePaymentRequest) (*schema.GooglePaymentResponse, *http.Response, error) {
@@ -543,7 +543,7 @@ func (c *Client) PayWithGooglePay(ctx context.Context, googlePaymentRequest Goog
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &response)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&response)
@@ -561,15 +561,15 @@ func validateGooglePayRequest(request GooglePaymentRequest) error {
 }
 
 type SamsungPaymentRequest struct {
-	OrderNumber          string           `json:"orderNumber"`
-	Merchant             string           `json:"merchant"`
-	PaymentToken         string           `json:"paymentToken"`
-	Language             string           `json:"language"`
-	Description          string           `json:"description,omitempty"`
-	ClientId             string           `json:"clientId,omitempty"`
-	IP                   string           `json:"ip,omitempty"`
-	PreAuth              bool             `json:"preAuth,omitempty"`
-	AdditionalParameters map[string]string`json:"additionalParameters"`
+	OrderNumber          string            `json:"orderNumber"`
+	Merchant             string            `json:"merchant"`
+	PaymentToken         string            `json:"paymentToken"`
+	Language             string            `json:"language"`
+	Description          string            `json:"description,omitempty"`
+	ClientId             string            `json:"clientId,omitempty"`
+	IP                   string            `json:"ip,omitempty"`
+	PreAuth              bool              `json:"preAuth,omitempty"`
+	AdditionalParameters map[string]string `json:"additionalParameters"`
 }
 
 func (c *Client) PayWithSamsungPay(ctx context.Context, samsungPaymentRequest SamsungPaymentRequest) (*schema.SamsungPaymentResponse, *http.Response, error) {
@@ -586,7 +586,7 @@ func (c *Client) PayWithSamsungPay(ctx context.Context, samsungPaymentRequest Sa
 		return nil, nil, err
 	}
 	result, err := c.Do(req, &response)
-	if err !=nil {
+	if err != nil {
 		return nil, result, err
 	}
 	err = json.NewDecoder(result.Body).Decode(&response)

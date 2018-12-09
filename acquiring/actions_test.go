@@ -14,12 +14,12 @@ import (
 
 func prepareClient() (*Client, error) {
 	cfg := ClientConfig{
-		UserName: "test-api",
-		Currency: currency.RUB,
-		Password: "test",
-		Language: "ru",
+		UserName:           "test-api",
+		Currency:           currency.RUB,
+		Password:           "test",
+		Language:           "ru",
 		SessionTimeoutSecs: 1200,
-		SandboxMode: true,
+		SandboxMode:        true,
 	}
 
 	client, err := NewClient(&cfg, WithEndpoint("http://api-sberbank///"))
@@ -27,7 +27,7 @@ func prepareClient() (*Client, error) {
 	return client, err
 }
 
-func TestRegisterOrder(t *testing.T)  {
+func TestRegisterOrder(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test order validation", func(t *testing.T) {
 
@@ -35,7 +35,7 @@ func TestRegisterOrder(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "123",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
 		}
 
@@ -49,9 +49,9 @@ func TestRegisterOrder(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "123",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
-			ReturnUrl: "wrong\\localhost:6379",
+			ReturnUrl:   "wrong\\localhost:6379",
 		}
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
@@ -64,9 +64,9 @@ func TestRegisterOrder(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "1234567890123456789012345678901",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
-			ReturnUrl: "https://api-sberbank",
+			ReturnUrl:   "https://api-sberbank",
 		}
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
@@ -79,10 +79,10 @@ func TestRegisterOrder(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "1234567890123456",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
-			ReturnUrl: "https://api-sberbank",
-			FailUrl: "wrong\\localhost:6379",
+			ReturnUrl:   "https://api-sberbank",
+			FailUrl:     "wrong\\localhost:6379",
 		}
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
@@ -105,9 +105,9 @@ func TestRegisterOrder(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "1234567890123456",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
-			ReturnUrl: "https://localhost",
+			ReturnUrl:   "https://localhost",
 		}
 
 		response, _, err := server.Client.RegisterOrder(context.Background(), order)
@@ -120,7 +120,7 @@ func TestRegisterOrder(t *testing.T)  {
 	})
 }
 
-func TestRegisterPreAuthOrder(t *testing.T)  {
+func TestRegisterPreAuthOrder(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test order validation", func(t *testing.T) {
 
@@ -128,7 +128,7 @@ func TestRegisterPreAuthOrder(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "123",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
 		}
 
@@ -142,9 +142,9 @@ func TestRegisterPreAuthOrder(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "123",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
-			ReturnUrl: "wrong\\localhost:6379",
+			ReturnUrl:   "wrong\\localhost:6379",
 		}
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
@@ -157,9 +157,9 @@ func TestRegisterPreAuthOrder(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "1234567890123456789012345678901",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
-			ReturnUrl: "https://api-sberbank",
+			ReturnUrl:   "https://api-sberbank",
 		}
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
@@ -167,16 +167,15 @@ func TestRegisterPreAuthOrder(t *testing.T)  {
 		Expect(err.Error()).To(ContainSubstring("orderNumber is too long"))
 	})
 
-
 	t.Run("Validate failUrl", func(t *testing.T) {
 		client, _ := prepareClient()
 
 		order := Order{
 			OrderNumber: "1234567890123456",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
-			ReturnUrl: "https://api-sberbank",
-			FailUrl: "wrong\\localhost:6379",
+			ReturnUrl:   "https://api-sberbank",
+			FailUrl:     "wrong\\localhost:6379",
 		}
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
@@ -199,9 +198,9 @@ func TestRegisterPreAuthOrder(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "1234567890123456",
-			Amount: 100,
+			Amount:      100,
 			Description: "Test",
-			ReturnUrl: "https://localhost",
+			ReturnUrl:   "https://localhost",
 		}
 
 		response, _, err := server.Client.RegisterOrderPreAuth(context.Background(), order)
@@ -213,7 +212,7 @@ func TestRegisterPreAuthOrder(t *testing.T)  {
 	})
 }
 
-func TestDeposit(t *testing.T)  {
+func TestDeposit(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Validate empty deposit order number", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -232,7 +231,7 @@ func TestDeposit(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "1234567890123456789012345678901",
-			Amount: 100,
+			Amount:      100,
 		}
 
 		_, _, err := client.Deposit(context.Background(), order)
@@ -254,7 +253,7 @@ func TestDeposit(t *testing.T)  {
 
 		order := Order{
 			OrderNumber: "1234567890123456",
-			Amount: 100,
+			Amount:      100,
 		}
 
 		response, _, err := server.Client.Deposit(context.Background(), order)
@@ -288,7 +287,7 @@ func TestReverseOrder(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.OrderResponse{
-				ErrorCode: 0,
+				ErrorCode:    0,
 				ErrorMessage: "Успешно",
 			})
 		})
@@ -300,7 +299,7 @@ func TestReverseOrder(t *testing.T) {
 		response, _, err := server.Client.Deposit(context.Background(), order)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
-			"ErrorCode": Equal(0),
+			"ErrorCode":    Equal(0),
 			"ErrorMessage": Equal("Успешно"),
 		})))
 	})
@@ -313,7 +312,7 @@ func TestRefundOrder(t *testing.T) {
 
 		order := Order{
 			OrderNumber: "123",
-			Amount: 0,
+			Amount:      0,
 		}
 
 		_, _, err := client.RefundOrder(context.Background(), order)
@@ -322,7 +321,7 @@ func TestRefundOrder(t *testing.T) {
 
 		order = Order{
 			OrderNumber: "1234567890123456789012345678901",
-			Amount: 1,
+			Amount:      1,
 		}
 
 		_, _, err = client.RefundOrder(context.Background(), order)
@@ -331,7 +330,7 @@ func TestRefundOrder(t *testing.T) {
 
 		order = Order{
 			OrderNumber: "",
-			Amount: 1,
+			Amount:      1,
 		}
 
 		_, _, err = client.RefundOrder(context.Background(), order)
@@ -352,7 +351,6 @@ func TestGetOrderStatus(t *testing.T) {
 		_, _, err := client.RefundOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("orderNumber is too long"))
-
 
 		order = Order{
 			OrderNumber: "",
@@ -392,10 +390,10 @@ func TestEnrollment(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.EnrollmentResponse{
-				ErrorCode: 0,
+				ErrorCode:    0,
 				ErrorMessage: "Успешно",
-				EmitterName: "TEST",
-				Enrolled: 'Y',
+				EmitterName:  "TEST",
+				Enrolled:     'Y',
 			})
 		})
 
@@ -406,14 +404,14 @@ func TestEnrollment(t *testing.T) {
 		response, _, err := server.Client.VerifyEnrollment(context.Background(), enrollment)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
-			"ErrorCode": Equal(0),
+			"ErrorCode":    Equal(0),
 			"ErrorMessage": Equal("Успешно"),
-			"Enrolled": Equal(byte('Y')),
+			"Enrolled":     Equal(byte('Y')),
 		})))
 	})
 }
 
-func TestBindingCard(t *testing.T)  {
+func TestBindingCard(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test Bind Validate", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -442,7 +440,7 @@ func TestBindingCard(t *testing.T)  {
 	t.Run("Test validate get bindings", func(t *testing.T) {
 		client, _ := prepareClient()
 
-		longString :=  make([]byte, 300)
+		longString := make([]byte, 300)
 		_, _, err := client.GetBindings(context.Background(), string(longString), nil)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("clientId is too long"))
@@ -456,7 +454,7 @@ func TestBindingCard(t *testing.T)  {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.BindingsResponse{
-				ErrorCode: 2,
+				ErrorCode:    2,
 				ErrorMessage: "Binding is active",
 			})
 		})
@@ -468,14 +466,14 @@ func TestBindingCard(t *testing.T)  {
 		response, _, err := server.Client.BindCard(context.Background(), binding)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
-			"ErrorCode": Equal(2),
+			"ErrorCode":    Equal(2),
 			"ErrorMessage": Equal("Binding is active"),
 		})))
 	})
 
 }
 
-func TestReceiptStatus(t *testing.T)  {
+func TestReceiptStatus(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test Receipt Status Validation Request", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -486,7 +484,6 @@ func TestReceiptStatus(t *testing.T)  {
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("pass orderNumber"))
-
 
 		receipt = ReceiptStatusRequest{
 			OrderNumber: "1234567890123456789012345678901",
@@ -506,7 +503,7 @@ func TestReceiptStatus(t *testing.T)  {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.BindingsResponse{
-				ErrorCode: 2,
+				ErrorCode:    2,
 				ErrorMessage: "Binding is active",
 			})
 		})
@@ -518,13 +515,13 @@ func TestReceiptStatus(t *testing.T)  {
 		response, _, err := server.Client.BindCard(context.Background(), binding)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
-			"ErrorCode": Equal(2),
+			"ErrorCode":    Equal(2),
 			"ErrorMessage": Equal("Binding is active"),
 		})))
 	})
 }
 
-func TestApplePaymentRequest(t *testing.T)  {
+func TestApplePaymentRequest(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test apple payment request validation", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -539,7 +536,7 @@ func TestApplePaymentRequest(t *testing.T)  {
 
 		req = ApplePaymentRequest{
 			OrderNumber: "123",
-			Merchant: "123",
+			Merchant:    "123",
 		}
 
 		_, _, err = client.PayWithApplePay(context.Background(), req)
@@ -563,8 +560,8 @@ func TestApplePaymentRequest(t *testing.T)  {
 		})
 
 		req := ApplePaymentRequest{
-			OrderNumber: "test",
-			Merchant: "test",
+			OrderNumber:  "test",
+			Merchant:     "test",
 			PaymentToken: "test",
 		}
 
@@ -580,7 +577,7 @@ func TestApplePaymentRequest(t *testing.T)  {
 
 }
 
-func TestGooglePaymentRequest(t *testing.T)  {
+func TestGooglePaymentRequest(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test apple payment request validation", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -594,8 +591,8 @@ func TestGooglePaymentRequest(t *testing.T)  {
 		Expect(err.Error()).To(ContainSubstring("orderNumber, merchant and PaymentToken are required"))
 
 		req = GooglePaymentRequest{
-			OrderNumber: "test",
-			Merchant: "test",
+			OrderNumber:  "test",
+			Merchant:     "test",
 			PaymentToken: "test",
 		}
 
@@ -620,8 +617,8 @@ func TestGooglePaymentRequest(t *testing.T)  {
 		})
 
 		req := GooglePaymentRequest{
-			OrderNumber: "test",
-			Merchant: "test",
+			OrderNumber:  "test",
+			Merchant:     "test",
 			PaymentToken: "test",
 		}
 
@@ -637,7 +634,7 @@ func TestGooglePaymentRequest(t *testing.T)  {
 
 }
 
-func TestSamsungPaymentRequest(t *testing.T)  {
+func TestSamsungPaymentRequest(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test apple payment request validation", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -651,8 +648,8 @@ func TestSamsungPaymentRequest(t *testing.T)  {
 		Expect(err.Error()).To(ContainSubstring("orderNumber, merchant and PaymentToken are required"))
 
 		req = SamsungPaymentRequest{
-			OrderNumber: "123",
-			Merchant: "123",
+			OrderNumber:  "123",
+			Merchant:     "123",
 			PaymentToken: "test",
 		}
 
@@ -677,8 +674,8 @@ func TestSamsungPaymentRequest(t *testing.T)  {
 		})
 
 		req := SamsungPaymentRequest{
-			OrderNumber: "test",
-			Merchant: "test",
+			OrderNumber:  "test",
+			Merchant:     "test",
 			PaymentToken: "test",
 		}
 

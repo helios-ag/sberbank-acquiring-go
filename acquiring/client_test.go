@@ -30,12 +30,12 @@ func (server *Server) Teardown() {
 
 func getCfg() *ClientConfig {
 	cfg := ClientConfig{
-		UserName: "sb-api",
-		Currency: currency.RUB,
-		Password: "sb",
-		Language: "ru",
+		UserName:           "sb-api",
+		Currency:           currency.RUB,
+		Password:           "sb",
+		Language:           "ru",
 		SessionTimeoutSecs: 1200,
-		SandboxMode: false,
+		SandboxMode:        false,
 	}
 	return &cfg
 }
@@ -72,7 +72,7 @@ func TestNewClient(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			json.NewEncoder(w).Encode(schema.OrderResponse{
-				ErrorCode: 4,
+				ErrorCode:    4,
 				ErrorMessage: "Доступ запрещён.",
 			})
 		})
@@ -83,7 +83,6 @@ func TestNewClient(t *testing.T) {
 
 	})
 }
-
 
 func TestClientDo(t *testing.T) {
 	RegisterTestingT(t)
@@ -96,7 +95,7 @@ func TestClientDo(t *testing.T) {
 			w.WriteHeader(http.StatusTooManyRequests)
 			json.NewEncoder(w).Encode(schema.Response{
 				ErrorMessage: "Доступ запрещён.",
-				ErrorCode: 5,
+				ErrorCode:    5,
 			})
 		})
 
@@ -108,5 +107,3 @@ func TestClientDo(t *testing.T) {
 		Expect(body).Should(ContainSubstring("\"errorCode\":5"))
 	})
 }
-
-

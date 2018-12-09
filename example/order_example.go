@@ -9,12 +9,12 @@ import (
 
 func main() {
 	cfg := acquiring.ClientConfig{
-		UserName: "test-api", // Replace with your own
-		Currency: currency.RUB,
-		Password: "test",     // Replace with your own
-		Language: "ru",
+		UserName:           "test-api", // Replace with your own
+		Currency:           currency.RUB,
+		Password:           "test", // Replace with your own
+		Language:           "ru",
 		SessionTimeoutSecs: 1200,
-		SandboxMode: true,
+		SandboxMode:        true,
 	}
 
 	client, err := acquiring.NewClient(&cfg)
@@ -23,7 +23,7 @@ func main() {
 	}
 	order := acquiring.Order{
 		OrderNumber: "test",
-		Amount: 100,
+		Amount:      100,
 		Description: "My Order for Client",
 	}
 	result, _, err := client.RegisterOrder(context.Background(), order)
