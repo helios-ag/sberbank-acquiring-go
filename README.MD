@@ -1,12 +1,14 @@
 [![LICENSE](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
 [![Build Status](https://travis-ci.com/helios-ag/sberbank-acquiring-go.svg?branch=master)](https://travis-ci.com/helios-ag/sberbank-acquiring-go)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/2d43f247eca97931f341/test_coverage)](https://codeclimate.com/github/helios-ag/sberbank-acquiring-go/test_coverage)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/helios-ag/sberbank-acquiring-go)](https://goreportcard.com/report/github.com/helios-ag/sberbank-acquiring-go)
 [![Godocs](https://img.shields.io/badge/golang-documentation-blue.svg)](https://godoc.org/github.com/helios-ag/sberbank-acquiring-go)
 
-#Sberbank Acquiring API Wrapper
+# Sberbank Acquiring API Wrapper
 
-##Example
+## Описание
+
+## Пример
 
 ```golang
 package main
