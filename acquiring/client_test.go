@@ -7,7 +7,6 @@ import (
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -70,8 +69,6 @@ func TestNewClient(t *testing.T) {
 		defer server.Teardown()
 
 		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusUnprocessableEntity)
 			json.NewEncoder(w).Encode(schema.OrderResponse{
 				ErrorCode:    4,
 				ErrorMessage: "Доступ запрещён.",
@@ -91,8 +88,6 @@ func TestClientDo(t *testing.T) {
 		defer server.Teardown()
 
 		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusTooManyRequests)
 			json.NewEncoder(w).Encode(schema.Response{
 				ErrorMessage: "Доступ запрещён.",
 				ErrorCode:    5,
@@ -101,10 +96,41 @@ func TestClientDo(t *testing.T) {
 
 		ctx := context.Background()
 		request, _ := server.Client.NewRestRequest(ctx, http.MethodGet, endpoints.Register, nil, nil)
-		res, err := server.Client.Do(request, nil)
+		_, err := server.Client.Do(request, nil)
 		Expect(err).To(HaveOccurred())
-		body, _ := ioutil.ReadAll(res.Body)
-		Expect(body).Should(ContainSubstring("\"errorCode\":5"))
+	})
+
+	t.Run("Test response body decode", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
+			json.NewEncoder(w).Encode(schema.Response{
+				ErrorMessage: "Доступ запрещён.",
+				ErrorCode:    5,
+			})
+		})
+
+		ctx := context.Background()
+		request, _ := server.Client.NewRestRequest(ctx, http.MethodGet, endpoints.Register, nil, nil)
+		_, err := server.Client.Do(request, nil)
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	t.Run("Test Bad Response Code", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		ctx := context.Background()
+		request, _ := server.Client.NewRestRequest(ctx, http.MethodGet, endpoints.Register, nil, nil)
+		_, err := server.Client.Do(request, nil)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("sberbank server responded with status code"))
 	})
 }
 
@@ -145,6 +171,7 @@ func TestNewRequest(t *testing.T) {
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("path contains rest request, use NewRestRequest instead"))
 	})
+
 	t.Run("Invalid config test", func(t *testing.T) {
 		_, err := NewClient(
 			&ClientConfig{},
@@ -159,5 +186,66 @@ func TestNewRequest(t *testing.T) {
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("passed in config cannot be nil"))
+	})
+
+	t.Run("Trigger NewRequest errors", func(t *testing.T) {
+		client, _ := NewClient(
+			&ClientConfig{
+				UserName:           "sb-api",
+				Currency:           currency.RUB,
+				Password:           "sb",
+				Language:           "ru",
+				SessionTimeoutSecs: 1200,
+				SandboxMode:        true,
+			},
+		)
+		ctx := context.Background()
+		// Cyrillic M
+		_, err := client.NewRequest(ctx, "М", endpoints.SamsungPay, nil)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("invalid method"))
+
+		_, err = client.NewRequest(ctx, "GET", "htt\\wrongUrl", nil)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("invalid character"))
+	})
+
+	t.Run("Trigger NewRestRequest errors", func(t *testing.T) {
+		client, _ := NewClient(
+			&ClientConfig{
+				UserName:           "sb-api",
+				Currency:           currency.RUB,
+				Password:           "sb",
+				Language:           "ru",
+				SessionTimeoutSecs: 1200,
+				SandboxMode:        true,
+			},
+		)
+		ctx := context.Background()
+		// Cyrillic M
+		_, err := client.NewRestRequest(ctx, "М", endpoints.SamsungPay, nil, nil)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("invalid method"))
+
+		_, err = client.NewRestRequest(ctx, "GET", "htt\\wrongUrl", nil, nil)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("invalid character"))
+	})
+
+	t.Run("Test improper Config url", func(t *testing.T) {
+		_, err := NewClient(
+			&ClientConfig{
+				UserName:           "sb-api",
+				Currency:           currency.RUB,
+				Password:           "sb",
+				Language:           "ru",
+				SessionTimeoutSecs: 1200,
+				SandboxMode:        true,
+				endpoint:           "http\\:wrongUrl",
+			},
+		)
+
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("unable to parse URL"))
 	})
 }

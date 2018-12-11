@@ -114,7 +114,6 @@ func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data in
 		uri = c.Config.endpoint + urlPath
 	}
 
-	method = "POST"
 	reqBodyData, _ := json.Marshal(data)
 
 	req, err := http.NewRequest(method, uri, bytes.NewReader(reqBodyData))
