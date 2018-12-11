@@ -97,7 +97,7 @@ func TestClientDo(t *testing.T) {
 		ctx := context.Background()
 		request, _ := server.Client.NewRestRequest(ctx, http.MethodGet, endpoints.Register, nil, nil)
 		_, err := server.Client.Do(request, nil)
-		Expect(err).To(HaveOccurred())
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	t.Run("Test response body decode", func(t *testing.T) {
