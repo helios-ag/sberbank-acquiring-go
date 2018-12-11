@@ -373,9 +373,6 @@ func TestEnrollment(t *testing.T) {
 		_, _, err := client.VerifyEnrollment(context.Background(), enrollment)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("pan length shouldn't be less 13 or more 19 symbols"))
-
-		enrollment = "411111111111"
-
 	})
 
 	t.Run("Test Enrollment response mapping", func(t *testing.T) {

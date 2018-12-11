@@ -73,11 +73,7 @@ func (c *Client) NewRestRequest(ctx context.Context, method, urlPath string, dat
 		uri = c.Config.endpoint + urlPath
 	}
 
-	jsonParamsEncoded, err := json.Marshal(jsonParams)
-
-	if err != nil {
-		return nil, err
-	}
+	jsonParamsEncoded, _ := json.Marshal(jsonParams)
 
 	body := url.Values{}
 	body.Add("userName", c.Config.UserName)
@@ -119,11 +115,7 @@ func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data in
 	}
 
 	method = "POST"
-	reqBodyData, err := json.Marshal(data)
-
-	if err != nil {
-		return nil, err
-	}
+	reqBodyData, _ := json.Marshal(data)
 
 	req, err := http.NewRequest(method, uri, bytes.NewReader(reqBodyData))
 

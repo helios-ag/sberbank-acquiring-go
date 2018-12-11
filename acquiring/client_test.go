@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 )
@@ -80,7 +81,6 @@ func TestNewClient(t *testing.T) {
 		ctx := context.Background()
 		_, err := server.Client.NewRestRequest(ctx, "GET", endpoints.Register, nil, nil)
 		Expect(err).ShouldNot(HaveOccurred())
-
 	})
 }
 
@@ -105,5 +105,59 @@ func TestClientDo(t *testing.T) {
 		Expect(err).To(HaveOccurred())
 		body, _ := ioutil.ReadAll(res.Body)
 		Expect(body).Should(ContainSubstring("\"errorCode\":5"))
+	})
+}
+
+func TestNewRequest(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Test Sandbox enabled mode", func(t *testing.T) {
+		client, _ := NewClient(
+			&ClientConfig{
+				UserName:           "sb-api",
+				Currency:           currency.RUB,
+				Password:           "sb",
+				Language:           "ru",
+				SessionTimeoutSecs: 1200,
+				SandboxMode:        true,
+			},
+		)
+
+		ctx := context.Background()
+		res, err := client.NewRestRequest(ctx, "GET", endpoints.Register, nil, nil)
+		Expect(err).ShouldNot(HaveOccurred())
+		u, _ := url.Parse(APISandboxURI)
+		Expect(res.URL.Host).To(ContainSubstring(u.Host))
+	})
+
+	t.Run("Add rest to path", func(t *testing.T) {
+		client, _ := NewClient(
+			&ClientConfig{
+				UserName:           "sb-api",
+				Currency:           currency.RUB,
+				Password:           "sb",
+				Language:           "ru",
+				SessionTimeoutSecs: 1200,
+				SandboxMode:        true,
+			},
+		)
+		ctx := context.Background()
+		_, err := client.NewRequest(ctx, http.MethodGet, endpoints.Register, nil)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("path contains rest request, use NewRestRequest instead"))
+	})
+	t.Run("Invalid config test", func(t *testing.T) {
+		_, err := NewClient(
+			&ClientConfig{},
+		)
+
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("unable to validate given config"))
+	})
+
+	t.Run("Empty config test", func(t *testing.T) {
+		_, err := NewClient(nil)
+
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("passed in config cannot be nil"))
 	})
 }
