@@ -1,5 +1,6 @@
 package schema
 
+// Response from PayWithApplePay request
 type ApplePaymentResponse struct {
 	Data struct {
 		OrderID string `json:"orderId"`
@@ -49,6 +50,7 @@ type ApplePaymentResponse struct {
 	} `json:"error,omitempty"`
 }
 
+// Response from PayWithSamsungPay request
 type SamsungPaymentResponse struct {
 	Success bool `json:"success"`
 	Data    struct {
@@ -61,6 +63,7 @@ type SamsungPaymentResponse struct {
 	} `json:"error,omitempty"`
 }
 
+// Response from PayWithGooglePay request
 type GooglePaymentResponse struct {
 	Success bool `json:"success"`
 	Data    struct {

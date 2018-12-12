@@ -36,6 +36,7 @@ type Order struct {
 	Features       string
 	JSONParams     map[string]string
 }
+
 // RegisterOrder
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:register
 func (c *Client) RegisterOrder(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
@@ -49,6 +50,7 @@ func (c *Client) RegisterOrder(ctx context.Context, order Order) (*schema.OrderR
 
 	return orderResponse, result, err
 }
+
 // RegisterOrderPreAuth
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:registerpreauth
 func (c *Client) RegisterOrderPreAuth(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
@@ -226,7 +228,7 @@ func validateRefundOrder(order Order) error {
 
 // GetOrderStatus
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getorderstatusextended
-func (c *Client) GetOrderStatus(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
+func (c *Client) GetOrderStatus(ctx context.Context, order Order) (*schema.OrderStatusResponse, *http.Response, error) {
 	path := endpoints.GetOrderStatusExtended
 
 	if err := validateOrderNumber(order); err != nil {
@@ -236,7 +238,7 @@ func (c *Client) GetOrderStatus(ctx context.Context, order Order) (*schema.Order
 	body := make(map[string]string)
 	body["orderId"] = order.OrderNumber
 
-	var orderResponse schema.OrderResponse
+	var orderResponse schema.OrderStatusResponse
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
 
 	if err != nil {
@@ -334,6 +336,7 @@ type Binding struct {
 	newExpiry  int
 	JSONParams map[string]string
 }
+
 // BindCard
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:bindcard
 func (c *Client) BindCard(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
@@ -348,6 +351,7 @@ func (c *Client) BindCard(ctx context.Context, binding Binding) (*schema.Respons
 
 	return c.bind(ctx, path, body, binding.JSONParams)
 }
+
 // UnBindCard
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:unbindcard
 func (c *Client) UnBindCard(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
@@ -362,6 +366,7 @@ func (c *Client) UnBindCard(ctx context.Context, binding Binding) (*schema.Respo
 
 	return c.bind(ctx, path, body, binding.JSONParams)
 }
+
 // ExtendBinding
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:extendbinding
 func (c *Client) ExtendBinding(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
@@ -415,6 +420,7 @@ func (c *Client) bind(ctx context.Context, path string, body map[string]string, 
 	}
 	return &response, result, err
 }
+
 // GetBindings
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getbindings
 func (c *Client) GetBindings(ctx context.Context, clientId string, jsonParams map[string]string) (*schema.BindingsResponse, *http.Response, error) {
@@ -450,6 +456,7 @@ type ReceiptStatusRequest struct {
 	UUID        string
 	JsonParams  map[string]string
 }
+
 // GetReceiptStatus
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getreceiptstatus
 func (c *Client) GetReceiptStatus(ctx context.Context, receiptStatusRequest ReceiptStatusRequest) (*schema.ReceiptStatus, *http.Response, error) {
@@ -504,6 +511,7 @@ type ApplePaymentRequest struct {
 	PreAuth              bool   `json:"preAuth,omitempty"`
 	AdditionalParameters map[string]string
 }
+
 // PayWithApplePay
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:payment_applepay
 func (c *Client) PayWithApplePay(ctx context.Context, applePaymentRequest ApplePaymentRequest) (*schema.ApplePaymentResponse, *http.Response, error) {
@@ -566,6 +574,7 @@ type GooglePaymentRequest struct {
 	PreAuth              bool              `json:"preAuth,omitempty"`
 	AdditionalParameters map[string]string `json:"additionalParameters"`
 }
+
 // PayWithGooglePay
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:payment_googlepay
 func (c *Client) PayWithGooglePay(ctx context.Context, googlePaymentRequest GooglePaymentRequest) (*schema.GooglePaymentResponse, *http.Response, error) {
@@ -599,6 +608,7 @@ func validateGooglePayRequest(request GooglePaymentRequest) error {
 	}
 	return nil
 }
+
 // SamsungPaymentRequest
 // "OrderNumber" _required_ used to pass orderId to api
 // "Merchant" _required_ merchant is API

@@ -1,5 +1,6 @@
 package schema
 
+// Response received from GetReceiptStatus
 type ReceiptStatus struct {
 	ErrorCode    int    `json:"errorCode,omitempty"`
 	ErrorMessage string `json:"errorMessage,omitempty"`

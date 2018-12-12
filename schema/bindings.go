@@ -1,5 +1,6 @@
 package schema
 
+// Mapped Binding response from GetBindings request
 type BindingsResponse struct {
 	ErrorCode    int    `json:"errorCode"`
 	ErrorMessage string `json:"errorMessage,omitempty"`
