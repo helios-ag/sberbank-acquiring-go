@@ -130,13 +130,17 @@ func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data in
 	return req, nil
 }
 
+var reader = func(r io.Reader) ([]byte, error){
+	return ioutil.ReadAll(r)
+}
+
 func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(r)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := reader(resp.Body)
 	if err != nil {
 		resp.Body.Close()
 		return resp, err
@@ -161,6 +165,8 @@ func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 
 	return resp, err
 }
+
+
 
 func errorFromResponse(resp *http.Response, body []byte) error {
 	if !strings.HasPrefix(resp.Header.Get("Content-Type"), "application/json") {

@@ -1,5 +1,6 @@
 package currency
 
+// Currency code constants
 const (
 	EUR int = 978
 	RUB int = 643

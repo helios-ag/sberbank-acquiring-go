@@ -3,10 +3,12 @@ package acquiring
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/helios-ag/sberbank-acquiring-go/currency"
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
 	. "github.com/onsi/gomega"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -93,11 +95,16 @@ func TestClientDo(t *testing.T) {
 				ErrorCode:    5,
 			})
 		})
-
+		// Override internal reader func with
+		reader = func(r io.Reader) (bytes []byte, e error) {
+			return nil, errors.New("buf overflow")
+		}
 		ctx := context.Background()
 		request, _ := server.Client.NewRestRequest(ctx, http.MethodGet, endpoints.Register, nil, nil)
 		_, err := server.Client.Do(request, nil)
-		Expect(err).ToNot(HaveOccurred())
+
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("buf overflow"))
 	})
 
 	t.Run("Test response body decode", func(t *testing.T) {

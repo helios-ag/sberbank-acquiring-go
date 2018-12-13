@@ -1,5 +1,6 @@
 package endpoints
 
+// API endpoints
 const (
 	Register               string = "/payment/rest/register.do"
 	RegisterPreAuth        string = "/payment/rest/registerPreAuth.do"
