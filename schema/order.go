@@ -1,12 +1,12 @@
 package schema
 
-// Common mapped Response received from Sberbank API
+// Response is mapped response received from Sberbank API
 type Response struct {
 	ErrorCode    int    `json:"errorCode,omitempty"`
 	ErrorMessage string `json:"errorMessage,omitempty"`
 }
 
-// Response received from RegisterOrder and RegisterOrderPreAuth requests
+// OrderResponse is response received from RegisterOrder and RegisterOrderPreAuth requests
 type OrderResponse struct {
 	OrderId      string `json:"orderId,omitempty"`
 	FormUrl      string `json:"formUrl,omitempty"`
@@ -14,7 +14,7 @@ type OrderResponse struct {
 	ErrorMessage string `json:"errorMessage,omitempty"`
 }
 
-// Response from GetOrderStatus request
+// OrderStatusResponse is response from GetOrderStatus request
 type OrderStatusResponse struct {
 	OrderNumber           string `json:"orderNumber"`
 	OrderStatus           int    `json:"orderStatus,omitempty"`

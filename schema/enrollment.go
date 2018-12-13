@@ -1,6 +1,6 @@
 package schema
 
-// Response mapping from Enrollment request
+// EnrollmentResponse is response mapping from Enrollment request
 type EnrollmentResponse struct {
 	ErrorCode          int    `json:"errorCode,omitempty"`
 	ErrorMessage       string `json:"errorMessage,omitempty"`
