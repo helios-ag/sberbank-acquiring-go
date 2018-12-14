@@ -37,7 +37,7 @@ type Order struct {
 	JSONParams     map[string]string
 }
 
-// RegisterOrder
+// RegisterOrder request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:register
 func (c *Client) RegisterOrder(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
 	path := endpoints.Register
@@ -51,7 +51,7 @@ func (c *Client) RegisterOrder(ctx context.Context, order Order) (*schema.OrderR
 	return orderResponse, result, err
 }
 
-// RegisterOrderPreAuth
+// RegisterOrderPreAuth request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:registerpreauth
 func (c *Client) RegisterOrderPreAuth(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
 	path := endpoints.RegisterPreAuth
@@ -91,16 +91,16 @@ func validateRegisterOrder(order Order) error {
 
 func (c *Client) register(ctx context.Context, path string, order Order) (*schema.OrderResponse, *http.Response, error) {
 	body := make(map[string]string)
-	body["orderNumber"] = order.OrderNumber
-	body["amount"] = strconv.Itoa(order.Amount)
-	body["returnUrl"] = order.ReturnURL
-	body["failUrl"] = order.FailURL
-	body["description"] = order.Description
-	body["pageView"] = order.PageView
-	body["merchantLogin"] = order.MerchantLogin
+	body["orderNumber"]    = order.OrderNumber
+	body["amount"]         = strconv.Itoa(order.Amount)
+	body["returnUrl"]      = order.ReturnURL
+	body["failUrl"]        = order.FailURL
+	body["description"]    = order.Description
+	body["pageView"]       = order.PageView
+	body["merchantLogin"]  = order.MerchantLogin
 	body["expirationDate"] = order.ExpirationDate
-	body["bindingId"] = order.BindingID
-	body["features"] = order.Features
+	body["bindingId"]      = order.BindingID
+	body["features"]       = order.Features
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
 
 	if err != nil {
@@ -119,7 +119,7 @@ func (c *Client) register(ctx context.Context, path string, order Order) (*schem
 	return &orderResponse, result, err
 }
 
-// Deposit
+// Deposit request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:deposit
 func (c *Client) Deposit(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
 	path := endpoints.Deposit
@@ -149,7 +149,7 @@ func (c *Client) Deposit(ctx context.Context, order Order) (*schema.OrderRespons
 	return &orderResponse, result, err
 }
 
-// ReverseOrder method
+// ReverseOrder request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:reverse
 func (c *Client) ReverseOrder(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
 	path := endpoints.Reverse
@@ -178,7 +178,7 @@ func (c *Client) ReverseOrder(ctx context.Context, order Order) (*schema.OrderRe
 	return &orderResponse, result, err
 }
 
-// RefundOrder
+// RefundOrder request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:refund
 func (c *Client) RefundOrder(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
 	path := endpoints.Refund
@@ -226,7 +226,7 @@ func validateRefundOrder(order Order) error {
 	return nil
 }
 
-// GetOrderStatus
+// GetOrderStatus request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getorderstatusextended
 func (c *Client) GetOrderStatus(ctx context.Context, order Order) (*schema.OrderStatusResponse, *http.Response, error) {
 	path := endpoints.GetOrderStatusExtended
@@ -269,7 +269,7 @@ func validateOrderNumber(order Order) error {
 	return nil
 }
 
-// VerifyEnrollment
+// VerifyEnrollment request
 // Checks if card enrolled in 3D Sec
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:verifyEnrollment
 func (c *Client) VerifyEnrollment(ctx context.Context, pan string) (*schema.EnrollmentResponse, *http.Response, error) {
@@ -307,7 +307,7 @@ func validatePan(pan string) error {
 	return nil
 }
 
-// UpdateSSLCardList
+// UpdateSSLCardList request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:updateSSLCardList
 func (c *Client) UpdateSSLCardList(ctx context.Context, mdorder string, jsonParams map[string]string) (*schema.Response, *http.Response, error) {
 	path := endpoints.UpdateSSLCardList
@@ -331,32 +331,30 @@ func (c *Client) UpdateSSLCardList(ctx context.Context, mdorder string, jsonPara
 	return &response, result, err
 }
 
+// Binding is used to make binding related requests
 type Binding struct {
 	bindingID  string
 	newExpiry  int
 	JSONParams map[string]string
 }
 
-// BindCard
+// BindCard request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:bindcard
 func (c *Client) BindCard(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
 	path := endpoints.BindCard
 
-	if err := validateBind(binding); err != nil {
-		return nil, nil, err
-	}
-
-	body := make(map[string]string)
-	body["bindingId"] = binding.bindingID
-
-	return c.bind(ctx, path, body, binding.JSONParams)
+	return bind(ctx, c, path, binding)
 }
 
-// UnBindCard
+// UnBindCard request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:unbindcard
 func (c *Client) UnBindCard(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
 	path := endpoints.UnBindCard
 
+	return bind(ctx, c, path, binding)
+}
+
+var bind = func(ctx context.Context, client *Client, path string, binding Binding) (*schema.Response, *http.Response, error) {
 	if err := validateBind(binding); err != nil {
 		return nil, nil, err
 	}
@@ -364,10 +362,10 @@ func (c *Client) UnBindCard(ctx context.Context, binding Binding) (*schema.Respo
 	body := make(map[string]string)
 	body["bindingId"] = binding.bindingID
 
-	return c.bind(ctx, path, body, binding.JSONParams)
+	return client.bind(ctx, path, body, binding.JSONParams)
 }
 
-// ExtendBinding
+// ExtendBinding request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:extendbinding
 func (c *Client) ExtendBinding(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
 	path := endpoints.ExtendBinding
@@ -450,6 +448,7 @@ func (c *Client) GetBindings(ctx context.Context, clientId string, jsonParams ma
 	return &response, result, err
 }
 
+// ReceiptStatusRequest is used for building GetReceipt request
 type ReceiptStatusRequest struct {
 	OrderId     string
 	OrderNumber string
@@ -503,6 +502,7 @@ func validateReceiptStatusRequest(receiptStatusRequest ReceiptStatusRequest) err
 	return nil
 }
 
+// ApplePaymentRequest is used for building PayWithApplePay request
 type ApplePaymentRequest struct {
 	OrderNumber          string `json:"orderNumber"`
 	Merchant             string `json:"merchant"`
