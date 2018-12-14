@@ -15,11 +15,13 @@ import (
 	"strings"
 )
 
+// URLS for API endpoints
 const (
 	APIURI        string = "https://securepayments.sberbank.ru"
 	APISandboxURI string = "https://3dsec.sberbank.ru"
 )
 
+// ClientConfig is used to set client configuration
 type ClientConfig struct {
 	UserName           string
 	Password           string
@@ -31,11 +33,13 @@ type ClientConfig struct {
 	SandboxMode        bool
 }
 
+// Client is a client to SB API
 type Client struct {
 	Config     *ClientConfig
 	httpClient *http.Client
 }
 
+// Body struct
 type Body struct {
 	UserName           *string `json:"userName"`
 	Token              *string `json:"token"`
@@ -46,8 +50,10 @@ type Body struct {
 	JsonParams         []byte  `json:"jsonParams"`
 }
 
+// ClientOption is used to configure a Client.
 type ClientOption func(*Client)
 
+// WithToken configures a Client to use the specified token for authentication.
 func WithToken(token string) ClientOption {
 	return func(client *Client) {
 		client.Config.token = token
@@ -56,12 +62,15 @@ func WithToken(token string) ClientOption {
 	}
 }
 
+// WithEndpoint configures a Client to use the specified API endpoint.
 func WithEndpoint(endpoint string) ClientOption {
 	return func(client *Client) {
 		client.Config.endpoint = strings.TrimRight(endpoint, "/")
 	}
 }
 
+// NewRestRequest creates an HTTP request against the API with 'rest' in path. The returned request
+// is assigned with ctx and has all necessary headers set (auth, user agent, etc.).
 func (c *Client) NewRestRequest(ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error) {
 	uri := APIURI + urlPath
 
@@ -99,6 +108,9 @@ func (c *Client) NewRestRequest(ctx context.Context, method, urlPath string, dat
 	return req, nil
 }
 
+
+// NewRequest creates an HTTP request against the API (mobile payments). The returned request
+// is assigned with ctx and has all necessary headers set (auth, user agent, etc.).
 func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error) {
 	if strings.Contains(urlPath, "rest") {
 		return nil, fmt.Errorf("path contains rest request, use NewRestRequest instead")
@@ -134,6 +146,7 @@ var reader = func(r io.Reader) ([]byte, error){
 	return ioutil.ReadAll(r)
 }
 
+// Do performs an HTTP request against the API.
 func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(r)
 	if err != nil {
@@ -166,8 +179,6 @@ func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 	return resp, err
 }
 
-
-
 func errorFromResponse(resp *http.Response, body []byte) error {
 	if !strings.HasPrefix(resp.Header.Get("Content-Type"), "application/json") {
 		return nil
@@ -195,6 +206,7 @@ func (c *ClientConfig) validate() error {
 	return nil
 }
 
+// NewClient creates a new client.
 func NewClient(cfg *ClientConfig, options ...ClientOption) (*Client, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("passed in config cannot be nil")
