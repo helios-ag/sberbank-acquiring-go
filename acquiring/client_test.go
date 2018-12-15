@@ -1,6 +1,7 @@
 package acquiring
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -111,9 +112,7 @@ func TestClientDo(t *testing.T) {
 			return ioutil.ReadAll(r)
 		}
 	})
-}
-func TestClientDoWithoutSubstitutionReader(t *testing.T) {
-	RegisterTestingT(t)
+
 	t.Run("Test response body decode", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
@@ -145,6 +144,65 @@ func TestClientDoWithoutSubstitutionReader(t *testing.T) {
 		_, err := server.Client.Do(request, nil)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("sberbank server responded with status code"))
+	})
+}
+
+func TestErrorFromResponse(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Expect application/json", func(t *testing.T) {
+		resp := http.Response{
+			Body: ioutil.NopCloser(bytes.NewBufferString("Hello World")),
+			Header: make(http.Header, 0),
+		}
+		resp.Header.Set("Content-Type", "application/json")
+		body := []byte("abc")
+		err := errorFromResponse(&resp, body)
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	t.Run("Expect wrong json", func(t *testing.T) {
+		resp := http.Response{
+			Body: ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
+			Header: make(http.Header, 0),
+		}
+		resp.Header.Set("Content-Type", "application/json")
+		body := []byte("{\"test\": \"test\"}")
+		err := errorFromResponse(&resp, body)
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	t.Run("Expect wrong json header", func(t *testing.T) {
+		resp := http.Response{
+			Body: ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
+			Header: make(http.Header, 0),
+		}
+		resp.Header.Set("Content-Type", "application_json")
+		body := []byte("{\"test\": test\"}")
+		err := errorFromResponse(&resp, body)
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	t.Run("Expect Error", func(t *testing.T) {
+		resp := http.Response{
+			Body: ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
+			Header: make(http.Header, 0),
+		}
+		resp.Header.Set("Content-Type", "application/json")
+		body := []byte(`{"errorCode": 5, "errorMessage": "Ошибка"}`)
+		err := errorFromResponse(&resp, body)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("Ошибка"))
+	})
+
+	t.Run("Dont expect Error", func(t *testing.T) {
+		resp := http.Response{
+			Body: ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
+			Header: make(http.Header, 0),
+		}
+		resp.Header.Set("Content-Type", "application/json")
+		body := []byte(`{"errorCode": 0, "errorMessage": ""}`)
+		err := errorFromResponse(&resp, body)
+		Expect(err).ToNot(HaveOccurred())
 	})
 }
 
