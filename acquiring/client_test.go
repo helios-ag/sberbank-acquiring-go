@@ -9,6 +9,7 @@ import (
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
 	. "github.com/onsi/gomega"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -105,8 +106,14 @@ func TestClientDo(t *testing.T) {
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("buf overflow"))
+		// restore reader
+		reader = func(r io.Reader) ([]byte, error) {
+			return ioutil.ReadAll(r)
+		}
 	})
-
+}
+func TestClientDoWithoutSubstitutionReader(t *testing.T) {
+	RegisterTestingT(t)
 	t.Run("Test response body decode", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
