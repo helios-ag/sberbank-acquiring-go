@@ -108,7 +108,6 @@ func (c *Client) NewRestRequest(ctx context.Context, method, urlPath string, dat
 	return req, nil
 }
 
-
 // NewRequest creates an HTTP request against the API (mobile payments). The returned request
 // is assigned with ctx and has all necessary headers set (auth, user agent, etc.).
 func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error) {
@@ -142,7 +141,7 @@ func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data in
 	return req, nil
 }
 
-var reader = func(r io.Reader) ([]byte, error){
+var reader = func(r io.Reader) ([]byte, error) {
 	return ioutil.ReadAll(r)
 }
 

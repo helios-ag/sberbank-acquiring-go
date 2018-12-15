@@ -91,16 +91,16 @@ func validateRegisterOrder(order Order) error {
 
 func (c *Client) register(ctx context.Context, path string, order Order) (*schema.OrderResponse, *http.Response, error) {
 	body := make(map[string]string)
-	body["orderNumber"]    = order.OrderNumber
-	body["amount"]         = strconv.Itoa(order.Amount)
-	body["returnUrl"]      = order.ReturnURL
-	body["failUrl"]        = order.FailURL
-	body["description"]    = order.Description
-	body["pageView"]       = order.PageView
-	body["merchantLogin"]  = order.MerchantLogin
+	body["orderNumber"] = order.OrderNumber
+	body["amount"] = strconv.Itoa(order.Amount)
+	body["returnUrl"] = order.ReturnURL
+	body["failUrl"] = order.FailURL
+	body["description"] = order.Description
+	body["pageView"] = order.PageView
+	body["merchantLogin"] = order.MerchantLogin
 	body["expirationDate"] = order.ExpirationDate
-	body["bindingId"]      = order.BindingID
-	body["features"]       = order.Features
+	body["bindingId"] = order.BindingID
+	body["features"] = order.Features
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
 
 	if err != nil {
@@ -419,7 +419,7 @@ func (c *Client) bind(ctx context.Context, path string, body map[string]string, 
 	return &response, result, err
 }
 
-// GetBindings
+// GetBindings request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getbindings
 func (c *Client) GetBindings(ctx context.Context, clientId string, jsonParams map[string]string) (*schema.BindingsResponse, *http.Response, error) {
 	path := endpoints.GetBindings
@@ -456,7 +456,7 @@ type ReceiptStatusRequest struct {
 	JsonParams  map[string]string
 }
 
-// GetReceiptStatus
+// GetReceiptStatus request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getreceiptstatus
 func (c *Client) GetReceiptStatus(ctx context.Context, receiptStatusRequest ReceiptStatusRequest) (*schema.ReceiptStatus, *http.Response, error) {
 	path := endpoints.GetReceiptStatus
@@ -512,7 +512,7 @@ type ApplePaymentRequest struct {
 	AdditionalParameters map[string]string
 }
 
-// PayWithApplePay
+// PayWithApplePay request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:payment_applepay
 func (c *Client) PayWithApplePay(ctx context.Context, applePaymentRequest ApplePaymentRequest) (*schema.ApplePaymentResponse, *http.Response, error) {
 	path := endpoints.ApplePay
@@ -546,7 +546,7 @@ func validateApplePaymentRequest(request ApplePaymentRequest) error {
 	return nil
 }
 
-// GooglePaymentRequest
+// GooglePaymentRequest request
 // "OrderNumber" _required_ used to pass orderId to api
 // "Merchant" _required_ merchant is API
 // "PaymentToken" _required_ token encoded in base64
@@ -575,7 +575,7 @@ type GooglePaymentRequest struct {
 	AdditionalParameters map[string]string `json:"additionalParameters"`
 }
 
-// PayWithGooglePay
+// PayWithGooglePay request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:payment_googlepay
 func (c *Client) PayWithGooglePay(ctx context.Context, googlePaymentRequest GooglePaymentRequest) (*schema.GooglePaymentResponse, *http.Response, error) {
 	path := endpoints.GooglePay
@@ -609,7 +609,7 @@ func validateGooglePayRequest(request GooglePaymentRequest) error {
 	return nil
 }
 
-// SamsungPaymentRequest
+// SamsungPaymentRequest is used to send PayWithSamsungPay request
 // "OrderNumber" _required_ used to pass orderId to api
 // "Merchant" _required_ merchant is API
 // "PaymentToken" _required_ token encoded in base64
@@ -631,6 +631,7 @@ type SamsungPaymentRequest struct {
 	AdditionalParameters map[string]string `json:"additionalParameters"`
 }
 
+// PayWithSamsungPay is used to send PayWithSamsungPay request
 func (c *Client) PayWithSamsungPay(ctx context.Context, samsungPaymentRequest SamsungPaymentRequest) (*schema.SamsungPaymentResponse, *http.Response, error) {
 	path := endpoints.SamsungPay
 
