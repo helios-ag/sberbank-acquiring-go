@@ -488,7 +488,19 @@ func TestBindingCard(t *testing.T) {
 		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
 	})
 
-	t.Run("Test validate Extend Binding", func(t *testing.T) {
+	t.Run("Test validate ExtendBinding with empty value", func(t *testing.T) {
+		client, _ := prepareClient()
+
+		binding := Binding{
+			bindingID: "",
+		}
+
+		_, _, err := client.ExtendBinding(context.Background(), binding)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
+	})
+
+	t.Run("Test validate ExtendBinding Expiry", func(t *testing.T) {
 		client, _ := prepareClient()
 
 		binding := Binding{
@@ -534,6 +546,62 @@ func TestBindingCard(t *testing.T) {
 		})))
 	})
 
+}
+
+func TestValidateBind(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Test bind validator", func(t *testing.T) {
+		binding := Binding{
+			bindingID: "",
+		}
+		err := validateBind(binding)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
+	})
+}
+
+func TestValidateExpiry(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Test expiry is ok", func(t *testing.T) {
+		binding := Binding{
+			newExpiry: 123123,
+		}
+		err := validateExpiry(binding)
+		Expect(err).ToNot(HaveOccurred())
+	})
+}
+
+func TestBind(t *testing.T)  {
+	RegisterTestingT(t)
+	t.Run("Test NewRestRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+		binding := Binding{
+			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			newExpiry: 123123,
+		}
+		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+		_, _, err := bind(context.Background(), server.Client, "wrong\\:url", binding)
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Test Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+		binding := Binding{
+			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			newExpiry: 123123,
+		}
+		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+		_, _, err := bind(context.Background(), server.Client, endpoints.Register, binding)
+		Expect(err).To(HaveOccurred())
+	})
 }
 
 func TestReceiptStatus(t *testing.T) {
