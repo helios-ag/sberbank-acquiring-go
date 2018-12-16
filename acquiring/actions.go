@@ -91,30 +91,29 @@ func validateRegisterOrder(order Order) error {
 
 func (c *Client) register(ctx context.Context, path string, order Order) (*schema.OrderResponse, *http.Response, error) {
 	body := make(map[string]string)
-	body["orderNumber"] = order.OrderNumber
-	body["amount"] = strconv.Itoa(order.Amount)
-	body["returnUrl"] = order.ReturnURL
-	body["failUrl"] = order.FailURL
-	body["description"] = order.Description
-	body["pageView"] = order.PageView
-	body["merchantLogin"] = order.MerchantLogin
+	body["orderNumber"]    = order.OrderNumber
+	body["amount"]         = strconv.Itoa(order.Amount)
+	body["returnUrl"]      = order.ReturnURL
+	body["failUrl"]        = order.FailURL
+	body["description"]    = order.Description
+	body["pageView"]       = order.PageView
+	body["merchantLogin"]  = order.MerchantLogin
 	body["expirationDate"] = order.ExpirationDate
-	body["bindingId"] = order.BindingID
-	body["features"] = order.Features
+	body["bindingId"]      = order.BindingID
+	body["features"]       = order.Features
+
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
 
 	if err != nil {
 		return nil, nil, err
 	}
+
 	var orderResponse schema.OrderResponse
 	result, err := c.Do(req, &orderResponse)
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&orderResponse)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&orderResponse)
 
 	return &orderResponse, result, err
 }
@@ -142,10 +141,8 @@ func (c *Client) Deposit(ctx context.Context, order Order) (*schema.OrderRespons
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&orderResponse)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&orderResponse)
+
 	return &orderResponse, result, err
 }
 
@@ -171,10 +168,8 @@ func (c *Client) ReverseOrder(ctx context.Context, order Order) (*schema.OrderRe
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&orderResponse)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&orderResponse)
+
 	return &orderResponse, result, err
 }
 
@@ -201,10 +196,8 @@ func (c *Client) RefundOrder(ctx context.Context, order Order) (*schema.OrderRes
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&orderResponse)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&orderResponse)
+
 	return &orderResponse, result, err
 }
 
@@ -248,10 +241,8 @@ func (c *Client) GetOrderStatus(ctx context.Context, order Order) (*schema.Order
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&orderResponse)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&orderResponse)
+
 	return &orderResponse, result, err
 }
 
@@ -292,10 +283,8 @@ func (c *Client) VerifyEnrollment(ctx context.Context, pan string) (*schema.Enro
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&enrollmentResponse)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&enrollmentResponse)
+
 	return &enrollmentResponse, result, err
 }
 
@@ -324,10 +313,8 @@ func (c *Client) UpdateSSLCardList(ctx context.Context, mdorder string, jsonPara
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&response)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
 	return &response, result, err
 }
 
@@ -412,10 +399,8 @@ func (c *Client) bind(ctx context.Context, path string, body map[string]string, 
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&response)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
 	return &response, result, err
 }
 
@@ -441,10 +426,8 @@ func (c *Client) GetBindings(ctx context.Context, clientId string, jsonParams ma
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&response)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
 	return &response, result, err
 }
 
@@ -481,10 +464,8 @@ func (c *Client) GetReceiptStatus(ctx context.Context, receiptStatusRequest Rece
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&response)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
 	return &response, result, err
 }
 
@@ -532,10 +513,8 @@ func (c *Client) PayWithApplePay(ctx context.Context, applePaymentRequest AppleP
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&response)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
 	return &response, result, err
 }
 
@@ -595,10 +574,8 @@ func (c *Client) PayWithGooglePay(ctx context.Context, googlePaymentRequest Goog
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&response)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
 	return &response, result, err
 }
 
@@ -649,10 +626,8 @@ func (c *Client) PayWithSamsungPay(ctx context.Context, samsungPaymentRequest Sa
 	if err != nil {
 		return nil, result, err
 	}
-	err = json.NewDecoder(result.Body).Decode(&response)
-	if err != nil {
-		return nil, result, err
-	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
 	return &response, result, err
 }
 

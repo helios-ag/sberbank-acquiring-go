@@ -212,6 +212,46 @@ func TestRegisterPreAuthOrder(t *testing.T) {
 	})
 }
 
+func TestRegister(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Trigger register error on NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		order := Order{
+			OrderNumber: "1234567890123456",
+			Amount:      100,
+			Description: "Test",
+			ReturnURL:   "https://localhost",
+		}
+
+		_, _, err := server.Client.register(context.Background(), "wrong\\localhost:6379", order)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Trigger register error on Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+		order := Order{
+			OrderNumber: "1234567890123456",
+			Amount:      100,
+			Description: "Test",
+			ReturnURL:   "https://localhost",
+		}
+
+		_, _, err := server.Client.register(context.Background(), endpoints.Register, order)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+
+}
+
 func TestDeposit(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Validate empty deposit order number", func(t *testing.T) {
@@ -261,6 +301,26 @@ func TestDeposit(t *testing.T) {
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
 			"ErrorCode": Equal(0),
 		})))
+	})
+
+	t.Run("Test deposit do", func(t *testing.T) {
+		t.Run("Trigger register error on Do", func(t *testing.T) {
+			server := newServer()
+			defer server.Teardown()
+
+			server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
+				http.Error(w, "Bad Request", http.StatusBadRequest)
+				return
+			})
+			order := Order{
+				OrderNumber: "1234567890123456",
+				Amount:      100,
+			}
+
+			_, _, err := server.Client.Deposit(context.Background(), order)
+			// We dont care what underlying error happened
+			Expect(err).To(HaveOccurred())
+		})
 	})
 }
 
@@ -412,6 +472,18 @@ func TestBindingCard(t *testing.T) {
 		}
 
 		_, _, err := client.BindCard(context.Background(), binding)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
+	})
+
+	t.Run("Test UnBind Validate", func(t *testing.T) {
+		client, _ := prepareClient()
+
+		binding := Binding{
+			bindingID: "",
+		}
+
+		_, _, err := client.UnBindCard(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
 	})
