@@ -1,6 +1,6 @@
 [![LICENSE](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
 [![Build Status](https://travis-ci.com/helios-ag/sberbank-acquiring-go.svg?branch=master)](https://travis-ci.com/helios-ag/sberbank-acquiring-go)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/2d43f247eca97931f341/test_coverage)](https://codeclimate.com/github/helios-ag/sberbank-acquiring-go/test_coverage)
+[![codecov](https://codecov.io/gh/helios-ag/sberbank-acquiring-go/branch/master/graph/badge.svg)](https://codecov.io/gh/helios-ag/sberbank-acquiring-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/helios-ag/sberbank-acquiring-go)](https://goreportcard.com/report/github.com/helios-ag/sberbank-acquiring-go)
 [![Godocs](https://img.shields.io/badge/golang-documentation-blue.svg)](https://godoc.org/github.com/helios-ag/sberbank-acquiring-go)
 [![CircleCI](https://circleci.com/gh/helios-ag/sberbank-acquiring-go.svg?style=svg)](https://circleci.com/gh/helios-ag/sberbank-acquiring-go)

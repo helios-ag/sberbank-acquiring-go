@@ -129,7 +129,7 @@ func (c *Client) Deposit(ctx context.Context, order Order) (*schema.OrderRespons
 
 	body := make(map[string]string)
 	body["orderId"] = order.OrderNumber
-	body["amount"] = strconv.Itoa(order.Amount)
+	body["amount"]  = strconv.Itoa(order.Amount)
 
 	var orderResponse schema.OrderResponse
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
@@ -137,6 +137,7 @@ func (c *Client) Deposit(ctx context.Context, order Order) (*schema.OrderRespons
 	if err != nil {
 		return nil, nil, err
 	}
+
 	result, err := c.Do(req, &orderResponse)
 	if err != nil {
 		return nil, result, err

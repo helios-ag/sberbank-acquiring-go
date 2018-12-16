@@ -322,6 +322,20 @@ func TestDeposit(t *testing.T) {
 			Expect(err).To(HaveOccurred())
 		})
 	})
+
+	t.Run("Test deposit with fail on NewRestRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		order := Order{
+			OrderNumber: "1234567890123456",
+			Amount:      100,
+		}
+
+		_, _, err := server.Client.Deposit(context.Background(), order)
+		// We dont care what underlying error happened, we just don't run server to handle request
+		Expect(err).To(HaveOccurred())
+	})
 }
 
 func TestReverseOrder(t *testing.T) {
@@ -339,11 +353,11 @@ func TestReverseOrder(t *testing.T) {
 
 	})
 
-	t.Run("Test Reverse order Mapping", func(t *testing.T) {
+	t.Run("Test ReverseOrder Mapping", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
 
-		server.Mux.HandleFunc(endpoints.Deposit, func(w http.ResponseWriter, r *http.Request) {
+		server.Mux.HandleFunc(endpoints.Reverse, func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.OrderResponse{
@@ -356,12 +370,41 @@ func TestReverseOrder(t *testing.T) {
 			OrderNumber: "9231a838-ac68-4a3e",
 		}
 
-		response, _, err := server.Client.Deposit(context.Background(), order)
+		response, _, err := server.Client.ReverseOrder(context.Background(), order)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
 			"ErrorCode":    Equal(0),
 			"ErrorMessage": Equal("Успешно"),
 		})))
+	})
+
+	t.Run("Test ReverseOrder NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		order := Order{
+			OrderNumber: "9231a838-ac68-4a3e",
+		}
+		_, _, err := server.Client.ReverseOrder(context.Background(), order)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("404"))
+	})
+
+	t.Run("Test ReverseOrder Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.Reverse, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+		order := Order{
+			OrderNumber: "1234567890123456",
+		}
+
+		_, _, err := server.Client.ReverseOrder(context.Background(), order)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
 	})
 }
 
@@ -397,6 +440,75 @@ func TestRefundOrder(t *testing.T) {
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("orderNumber cant be empty"))
 	})
+
+	t.Run("Test RefundOrder Mapping", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.Refund, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(schema.OrderResponse{
+				ErrorCode:    0,
+				ErrorMessage: "Успешно",
+			})
+		})
+
+		order := Order{
+			OrderNumber: "9231a838-ac68-4a3e",
+			Amount: 1,
+		}
+
+		response, _, err := server.Client.RefundOrder(context.Background(), order)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
+			"ErrorCode":    Equal(0),
+			"ErrorMessage": Equal("Успешно"),
+		})))
+	})
+
+	t.Run("Test RefundOrder NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		order := Order{
+			OrderNumber: "9231a838-ac68-4a3e",
+			Amount: 1,
+		}
+		_, _, err := server.Client.RefundOrder(context.Background(), order)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("404"))
+	})
+
+	t.Run("Test Refund Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.Refund, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+		order := Order{
+			OrderNumber: "1234567890123456",
+			Amount: 1,
+		}
+
+		_, _, err := server.Client.RefundOrder(context.Background(), order)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+}
+
+func TestValidateRefundOrder(t *testing.T)  {
+	RegisterTestingT(t)
+	t.Run("", func(t *testing.T) {
+		order := Order{
+			OrderNumber: "123",
+			Amount: 1,
+		}
+		err := validateRefundOrder(order)
+		Expect(err).ToNot(HaveOccurred())
+	})
 }
 
 func TestGetOrderStatus(t *testing.T) {
@@ -408,7 +520,7 @@ func TestGetOrderStatus(t *testing.T) {
 			OrderNumber: "1234567890123456789012345678901",
 		}
 
-		_, _, err := client.RefundOrder(context.Background(), order)
+		_, _, err := client.GetOrderStatus(context.Background(), order)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("orderNumber is too long"))
 
@@ -419,7 +531,37 @@ func TestGetOrderStatus(t *testing.T) {
 		_, _, err = client.RefundOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("orderNumber cant be empty"))
+	})
 
+	t.Run("Test GetOrderStatus NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		order := Order{
+			OrderNumber: "9231a838-ac68-4a3e",
+			Amount: 1,
+		}
+		_, _, err := server.Client.GetOrderStatus(context.Background(), order)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("404"))
+	})
+
+	t.Run("GetOrderStatus Refund Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.GetOrderStatusExtended, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+		order := Order{
+			OrderNumber: "1234567890123456",
+			Amount: 1,
+		}
+
+		_, _, err := server.Client.GetOrderStatus(context.Background(), order)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
 	})
 }
 
