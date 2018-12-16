@@ -563,6 +563,28 @@ func TestGetOrderStatus(t *testing.T) {
 		// We dont care what underlying error happened
 		Expect(err).To(HaveOccurred())
 	})
+
+	t.Run("GetOrderStatus is working as expected", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.GetOrderStatusExtended, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(schema.OrderStatusResponse{
+				OrderNumber: "70906e55-7114-41d6-8332-4609dc6590f4",
+				ErrorCode: 0,
+			})
+		})
+		order := Order{
+			OrderNumber: "1234567890123456",
+			Amount: 1,
+		}
+
+		_, _, err := server.Client.GetOrderStatus(context.Background(), order)
+		// We dont care what underlying error happened
+		Expect(err).ToNot(HaveOccurred())
+	})
 }
 
 func TestEnrollment(t *testing.T) {
@@ -602,6 +624,29 @@ func TestEnrollment(t *testing.T) {
 			"Enrolled":     Equal(byte('Y')),
 		})))
 	})
+
+	t.Run("Trigger verifyEnrollment error on Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.VerifyEnrollment, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		_, _, err := server.Client.VerifyEnrollment(context.Background(), "411111111111111")
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Test verifyEnrollment with fail on NewRestRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		_, _, err := server.Client.VerifyEnrollment(context.Background(), "411111111111111")
+		// We dont care what underlying error happened, we just don't run server to handle request
+		Expect(err).To(HaveOccurred())
+	})
 }
 
 func TestBindingCard(t *testing.T) {
@@ -616,6 +661,31 @@ func TestBindingCard(t *testing.T) {
 		_, _, err := client.BindCard(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
+	})
+
+	t.Run("Test Binding response mapping", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.BindCard, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(schema.BindingsResponse{
+				ErrorCode:    2,
+				ErrorMessage: "Binding is active",
+			})
+		})
+
+		binding := Binding{
+			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+		}
+
+		response, _, err := server.Client.BindCard(context.Background(), binding)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
+			"ErrorCode":    Equal(2),
+			"ErrorMessage": Equal("Binding is active"),
+		})))
 	})
 
 	t.Run("Test UnBind Validate", func(t *testing.T) {
@@ -652,6 +722,28 @@ func TestBindingCard(t *testing.T) {
 		_, _, err := client.ExtendBinding(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("new expiry date should have 6 digits"))
+	})
+
+	t.Run("Test ExtendBinding is ok", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.ExtendBinding, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(schema.BindingsResponse{
+				ErrorCode:    2,
+				ErrorMessage: "Binding is active",
+			})
+		})
+
+		binding := Binding{
+			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			newExpiry: 123123,
+		}
+		_, _, err := server.Client.ExtendBinding(context.Background(), binding)
+		// We dont care what underlying error happened
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	t.Run("Test validate get bindings", func(t *testing.T) {
@@ -768,29 +860,57 @@ func TestReceiptStatus(t *testing.T) {
 		Expect(err.Error()).To(ContainSubstring("orderNumber is too long"))
 	})
 
-	t.Run("Test Binding response mapping", func(t *testing.T) {
+	t.Run("Trigger GetReceiptStatus error on Do", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
 
-		server.Mux.HandleFunc(endpoints.BindCard, func(w http.ResponseWriter, r *http.Request) {
+		server.Mux.HandleFunc(endpoints.GetReceiptStatus, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		receipt := ReceiptStatusRequest{
+			OrderNumber: "1234567890123456789018901",
+		}
+
+		_, _, err := server.Client.GetReceiptStatus(context.Background(), receipt)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Test GetReceiptStatus with fail on NewRestRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		receipt := ReceiptStatusRequest{
+			OrderNumber: "1234567890123456789018901",
+		}
+
+		_, _, err := server.Client.GetReceiptStatus(context.Background(), receipt)
+		// We dont care what underlying error happened, we just don't run server to handle request
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("GetReceiptStatus is working as expected", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.GetReceiptStatus, func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(schema.BindingsResponse{
-				ErrorCode:    2,
-				ErrorMessage: "Binding is active",
+			json.NewEncoder(w).Encode(schema.OrderStatusResponse{
+				OrderNumber: "70906e55-7114-41d6-8332-4609dc6590f4",
+				ErrorCode: 0,
 			})
 		})
 
-		binding := Binding{
-			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+		receipt := ReceiptStatusRequest{
+			OrderNumber: "1234567890123456789018901",
 		}
 
-		response, _, err := server.Client.BindCard(context.Background(), binding)
+		_, _, err := server.Client.GetReceiptStatus(context.Background(), receipt)
+		// We dont care what underlying error happened
 		Expect(err).ToNot(HaveOccurred())
-		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
-			"ErrorCode":    Equal(2),
-			"ErrorMessage": Equal("Binding is active"),
-		})))
 	})
 }
 
@@ -960,5 +1080,93 @@ func TestSamsungPaymentRequest(t *testing.T) {
 				"OrderID": Equal("b926351f-a634-49cf-9484-ccb0a3b8cfad"),
 			}),
 		})))
+	})
+}
+
+func TestClient_UpdateSSLCardList(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Trigger UpdateSSLCardList error on Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.UpdateSSLCardList, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		_, _, err := server.Client.UpdateSSLCardList(context.Background(), "123123", nil)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Test UpdateSSLCardList with fail on NewRestRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		_, _, err := server.Client.UpdateSSLCardList(context.Background(), "123123", nil)
+		// We dont care what underlying error happened, we just don't run server to handle request
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("UpdateSSLCardList is working as expected", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.UpdateSSLCardList, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(schema.OrderStatusResponse{
+				OrderNumber: "70906e55-7114-41d6-8332-4609dc6590f4",
+				ErrorCode: 0,
+			})
+		})
+
+		_, _, err := server.Client.UpdateSSLCardList(context.Background(), "123123", nil)
+		// We dont care what underlying error happened
+		Expect(err).ToNot(HaveOccurred())
+	})
+}
+
+func TestClient_GetBindings(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Trigger GetBinding error on Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.GetBindings, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		_, _, err := server.Client.GetBindings(context.Background(), "123123", nil)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Test GetBinding with fail on NewRestRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		_, _, err := server.Client.GetBindings(context.Background(), "123123", nil)
+		// We dont care what underlying error happened, we just don't run server to handle request
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("GetBinding is working as expected", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.GetBindings, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(schema.OrderStatusResponse{
+				OrderNumber: "70906e55-7114-41d6-8332-4609dc6590f4",
+				ErrorCode: 0,
+			})
+		})
+
+		_, _, err := server.Client.GetBindings(context.Background(), "123123", nil)
+		// We dont care what underlying error happened
+		Expect(err).ToNot(HaveOccurred())
 	})
 }
