@@ -347,7 +347,8 @@ func TestClient_Deposit(t *testing.T) {
 	t.Run("Test deposit with fail on NewRestRequest", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
-
+		oldNewRequest := newRestRequest
+		newRestRequest = NewRestRequestStub
 		order := Order{
 			OrderNumber: "1234567890123456",
 			Amount:      100,
@@ -356,6 +357,7 @@ func TestClient_Deposit(t *testing.T) {
 		_, _, err := server.Client.Deposit(context.Background(), order)
 		// We dont care what underlying error happened, we just don't run server to handle request
 		Expect(err).To(HaveOccurred())
+		newRestRequest = oldNewRequest
 	})
 }
 
@@ -399,11 +401,9 @@ func TestClient_ReverseOrder(t *testing.T) {
 		})))
 	})
 
-	t.Run("Test ReverseOrder NewRequest", func(t *testing.T) {
+	t.Run("Test ReverseOrder 404", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
-		oldNewRequest := newRequest
-		newRequest = NewRequestStub
 
 		order := Order{
 			OrderNumber: "9231a838-ac68-4a3e",
@@ -411,7 +411,20 @@ func TestClient_ReverseOrder(t *testing.T) {
 		_, _, err := server.Client.ReverseOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("404"))
-		newRequest = oldNewRequest
+	})
+
+	t.Run("Test ReverseOrder NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+		oldNewRequest := newRestRequest
+		newRestRequest = NewRestRequestStub
+
+		order := Order{
+			OrderNumber: "9231a838-ac68-4a3e",
+		}
+		_, _, err := server.Client.ReverseOrder(context.Background(), order)
+		Expect(err).To(HaveOccurred())
+		newRestRequest = oldNewRequest
 	})
 
 	t.Run("Test ReverseOrder Do", func(t *testing.T) {
@@ -494,8 +507,7 @@ func TestClient_RefundOrder(t *testing.T) {
 	t.Run("Test RefundOrder NewRequest", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
-		oldNewRequest := newRequest
-		newRequest = NewRequestStub
+
 		order := Order{
 			OrderNumber: "9231a838-ac68-4a3e",
 			Amount: 1,
@@ -503,7 +515,21 @@ func TestClient_RefundOrder(t *testing.T) {
 		_, _, err := server.Client.RefundOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("404"))
-		newRequest = oldNewRequest
+	})
+
+	t.Run("Test RefundOrder NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+		oldNewRequest := newRestRequest
+		newRestRequest = NewRestRequestStub
+
+		order := Order{
+			OrderNumber: "9231a838-ac68-4a3e",
+			Amount: 1,
+		}
+		_, _, err := server.Client.RefundOrder(context.Background(), order)
+		Expect(err).To(HaveOccurred())
+		newRestRequest = oldNewRequest
 	})
 
 	t.Run("Test Refund Do", func(t *testing.T) {
@@ -562,8 +588,7 @@ func TestClient_GetOrderStatus(t *testing.T) {
 	t.Run("Test GetOrderStatus NewRequest", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
-		oldNewRequest := newRequest
-		newRequest = NewRequestStub
+
 		order := Order{
 			OrderNumber: "9231a838-ac68-4a3e",
 			Amount: 1,
@@ -571,7 +596,21 @@ func TestClient_GetOrderStatus(t *testing.T) {
 		_, _, err := server.Client.GetOrderStatus(context.Background(), order)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("404"))
-		newRequest = oldNewRequest
+	})
+
+	t.Run("Test GetOrderStatus NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+		oldNewRequest := newRestRequest
+		newRestRequest = NewRestRequestStub
+
+		order := Order{
+			OrderNumber: "9231a838-ac68-4a3e",
+			Amount: 1,
+		}
+		_, _, err := server.Client.GetOrderStatus(context.Background(), order)
+		Expect(err).To(HaveOccurred())
+		newRestRequest = oldNewRequest
 	})
 
 	t.Run("GetOrderStatus Refund Do", func(t *testing.T) {
@@ -615,7 +654,7 @@ func TestClient_GetOrderStatus(t *testing.T) {
 	})
 }
 
-func TestEnrollment(t *testing.T) {
+func TestClient_VerifyEnrollment(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Validate Enrollment PAN", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -670,16 +709,16 @@ func TestEnrollment(t *testing.T) {
 	t.Run("Test verifyEnrollment with fail on NewRestRequest", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
-		oldNewRequest := newRequest
-		newRequest = NewRequestStub
+		oldNewRequest := newRestRequest
+		newRestRequest = NewRestRequestStub
 		_, _, err := server.Client.VerifyEnrollment(context.Background(), "411111111111111")
 		// We dont care what underlying error happened, we just don't run server to handle request
 		Expect(err).To(HaveOccurred())
-		newRequest = oldNewRequest
+		newRestRequest = oldNewRequest
 	})
 }
 
-func TestBindingCard(t *testing.T) {
+func TestClient_BindCard(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test Bind Validate", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -946,7 +985,7 @@ func TestReceiptStatus(t *testing.T) {
 	})
 }
 
-func TestApplePaymentRequest(t *testing.T) {
+func TestClient_PayWithApplePay(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test apple payment request validation", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -1019,9 +1058,31 @@ func TestApplePaymentRequest(t *testing.T) {
 		// We dont care what underlying error happened
 		Expect(err).To(HaveOccurred())
 	})
+
+	t.Run("Test ApplePaymentDo NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+		oldNewRequest := newRequest
+		newRequest = NewRequestStub
+		server.Mux.HandleFunc(endpoints.ApplePay, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		req := ApplePaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+		}
+
+		_, _, err := server.Client.PayWithApplePay(context.Background(), req)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+		newRequest = oldNewRequest
+	})
 }
 
-func TestGooglePaymentRequest(t *testing.T) {
+func TestClient_PayWithGooglePay(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test apple payment request validation", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -1095,9 +1156,30 @@ func TestGooglePaymentRequest(t *testing.T) {
 		// We dont care what underlying error happened
 		Expect(err).To(HaveOccurred())
 	})
-}
 
-func TestSamsungPaymentRequest(t *testing.T) {
+	t.Run("Test GooglePaymentRequest NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+		oldNewRequest := newRequest
+		newRequest = NewRequestStub
+		server.Mux.HandleFunc(endpoints.GooglePay, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		req := GooglePaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+		}
+
+		_, _, err := server.Client.PayWithGooglePay(context.Background(), req)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+		newRequest = oldNewRequest
+	})
+}
+func TestClient_PayWithSamsungPay(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test apple payment request validation", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -1171,6 +1253,28 @@ func TestSamsungPaymentRequest(t *testing.T) {
 		// We dont care what underlying error happened
 		Expect(err).To(HaveOccurred())
 	})
+
+	t.Run("Test GooglePaymentRequest NewRequest", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+		oldNewRequest := newRequest
+		newRequest = NewRequestStub
+		server.Mux.HandleFunc(endpoints.SamsungPay, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		req := SamsungPaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+		}
+
+		_, _, err := server.Client.PayWithSamsungPay(context.Background(), req)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+		newRequest = oldNewRequest
+	})
 }
 
 func TestClient_UpdateSSLCardList(t *testing.T) {
@@ -1192,10 +1296,13 @@ func TestClient_UpdateSSLCardList(t *testing.T) {
 	t.Run("Test UpdateSSLCardList with fail on NewRestRequest", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
+		oldNewRequest := newRestRequest
+		newRestRequest = NewRestRequestStub
 
 		_, _, err := server.Client.UpdateSSLCardList(context.Background(), "123123", nil)
 		// We dont care what underlying error happened, we just don't run server to handle request
 		Expect(err).To(HaveOccurred())
+		newRestRequest = oldNewRequest
 	})
 
 	t.Run("UpdateSSLCardList is working as expected", func(t *testing.T) {
