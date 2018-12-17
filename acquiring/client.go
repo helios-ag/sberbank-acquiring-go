@@ -72,6 +72,10 @@ func WithEndpoint(endpoint string) ClientOption {
 // NewRestRequest creates an HTTP request against the API with 'rest' in path. The returned request
 // is assigned with ctx and has all necessary headers set (auth, user agent, etc.).
 func (c *Client) NewRestRequest(ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error) {
+	return newRestRequest(c, ctx, method, urlPath, data, jsonParams)
+}
+
+var newRestRequest = func(c *Client, ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error) {
 	uri := APIURI + urlPath
 
 	if c.Config.SandboxMode {
@@ -110,7 +114,13 @@ func (c *Client) NewRestRequest(ctx context.Context, method, urlPath string, dat
 
 // NewRequest creates an HTTP request against the API (mobile payments). The returned request
 // is assigned with ctx and has all necessary headers set (auth, user agent, etc.).
+// NewRestRequest creates an HTTP request against the API with 'rest' in path. The returned request
+// is assigned with ctx and has all necessary headers set (auth, user agent, etc.).
 func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error) {
+	return newRequest(c, ctx, method, urlPath, data)
+}
+
+var newRequest = func(c *Client, ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error) {
 	if strings.Contains(urlPath, "rest") {
 		return nil, fmt.Errorf("path contains rest request, use NewRestRequest instead")
 	}
