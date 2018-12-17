@@ -308,7 +308,7 @@ func TestDeposit(t *testing.T) {
 			server := newServer()
 			defer server.Teardown()
 
-			server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
+			server.Mux.HandleFunc(endpoints.Deposit, func(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 				return
 			})
@@ -968,6 +968,25 @@ func TestApplePaymentRequest(t *testing.T) {
 		})))
 	})
 
+	t.Run("Test ApplePaymentDo Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.ApplePay, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		req := ApplePaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+		}
+
+		_, _, err := server.Client.PayWithApplePay(context.Background(), req)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
 }
 
 func TestGooglePaymentRequest(t *testing.T) {
@@ -1025,6 +1044,25 @@ func TestGooglePaymentRequest(t *testing.T) {
 		})))
 	})
 
+	t.Run("Test GooglePaymentRequest Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.GooglePay, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		req := GooglePaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+		}
+
+		_, _, err := server.Client.PayWithGooglePay(context.Background(), req)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
 }
 
 func TestSamsungPaymentRequest(t *testing.T) {
@@ -1080,6 +1118,26 @@ func TestSamsungPaymentRequest(t *testing.T) {
 				"OrderID": Equal("b926351f-a634-49cf-9484-ccb0a3b8cfad"),
 			}),
 		})))
+	})
+
+	t.Run("Test Samsung Payment Request Do", func(t *testing.T) {
+		server := newServer()
+		defer server.Teardown()
+
+		server.Mux.HandleFunc(endpoints.SamsungPay, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		})
+
+		req := SamsungPaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+		}
+
+		_, _, err := server.Client.PayWithSamsungPay(context.Background(), req)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
 	})
 }
 
