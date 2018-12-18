@@ -51,7 +51,6 @@ var NewRequestStub = func(
 func TestClient_RegisterOrder(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test order validation", func(t *testing.T) {
-
 		client, _ := prepareClient()
 
 		order := Order{
@@ -203,7 +202,7 @@ func TestClient_RegisterPreAuthOrder(t *testing.T) {
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("unable to parse FailUrl"))
 	})
-	// TODO: Replace with ghttp from gomega
+
 	t.Run("Test Preauth Register Order response Mapping", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
@@ -851,7 +850,7 @@ func TestClient_BindCard(t *testing.T) {
 
 }
 
-func TestValidateBind(t *testing.T) {
+func TestClient_ValidateBind(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test bind validator", func(t *testing.T) {
 		binding := Binding{
@@ -863,7 +862,7 @@ func TestValidateBind(t *testing.T) {
 	})
 }
 
-func TestValidateExpiry(t *testing.T) {
+func TestClient_ValidateExpiry(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test expiry is ok", func(t *testing.T) {
 		binding := Binding{
@@ -874,7 +873,7 @@ func TestValidateExpiry(t *testing.T) {
 	})
 }
 
-func TestBind(t *testing.T)  {
+func TestClient_Bind(t *testing.T)  {
 	RegisterTestingT(t)
 	t.Run("Test NewRestRequest", func(t *testing.T) {
 		server := newServer()
@@ -907,7 +906,7 @@ func TestBind(t *testing.T)  {
 	})
 }
 
-func TestReceiptStatus(t *testing.T) {
+func TestClient_GetReceiptStatus(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test Receipt Status Validation Request", func(t *testing.T) {
 		client, _ := prepareClient()
@@ -929,7 +928,7 @@ func TestReceiptStatus(t *testing.T) {
 		Expect(err.Error()).To(ContainSubstring("orderNumber is too long"))
 	})
 
-	t.Run("Trigger GetReceiptStatus error on Do", func(t *testing.T) {
+	t.Run("GetReceiptStatus error on Do", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
 
@@ -947,7 +946,7 @@ func TestReceiptStatus(t *testing.T) {
 		Expect(err).To(HaveOccurred())
 	})
 
-	t.Run("Test GetReceiptStatus with fail on NewRestRequest", func(t *testing.T) {
+	t.Run("GetReceiptStatus fail on NewRestRequest", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
 		oldNewRequest := newRestRequest
@@ -962,7 +961,7 @@ func TestReceiptStatus(t *testing.T) {
 		newRestRequest = oldNewRequest
 	})
 
-	t.Run("GetReceiptStatus is working as expected", func(t *testing.T) {
+	t.Run("GetReceiptStatus is ok", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
 
