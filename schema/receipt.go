@@ -2,7 +2,7 @@ package schema
 
 // ReceiptStatus is response received from GetReceiptStatus
 type ReceiptStatus struct {
-	ErrorCode    int    `json:"errorCode,omitempty"`
+	ErrorCode    int    `json:"errorCode,string,omitempty"`
 	ErrorMessage string `json:"errorMessage,omitempty"`
 	OrderNumber  string `json:"orderNumber,omitempty"`
 	OrderId      string `json:"orderId,omitempty"`
