@@ -2,7 +2,7 @@ package schema
 
 // Response is mapped response received from Sberbank API
 type Response struct {
-	ErrorCode    int    `json:"errorCode,omitempty"`
+	ErrorCode    int    `json:"errorCode,string,omitempty"`
 	ErrorMessage string `json:"errorMessage,omitempty"`
 }
 
@@ -10,7 +10,7 @@ type Response struct {
 type OrderResponse struct {
 	OrderId      string `json:"orderId,omitempty"`
 	FormUrl      string `json:"formUrl,omitempty"`
-	ErrorCode    int    `json:"errorCode,omitempty"`
+	ErrorCode    int    `json:"errorCode,string,omitempty"`
 	ErrorMessage string `json:"errorMessage,omitempty"`
 }
 
@@ -20,7 +20,7 @@ type OrderStatusResponse struct {
 	OrderStatus           int    `json:"orderStatus,omitempty"`
 	ActionCode            int    `json:"actionCode"`
 	ActionCodeDescription string `json:"actionCodeDescription"`
-	ErrorCode             int    `json:"errorCode,omitempty"`
+	ErrorCode             int    `json:"errorCode,string,omitempty"`
 	ErrorMessage          string `json:"errorMessage,omitempty"`
 	Amount                int    `json:"amount"`
 	Currency              int    `json:"currency,omitempty"`
