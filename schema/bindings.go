@@ -2,8 +2,8 @@ package schema
 
 // BindingsResponse is mapped Binding response from GetBindings request
 type BindingsResponse struct {
-	ErrorCode    int    `json:"errorCode"`
-	ErrorMessage string `json:"errorMessage,omitempty"`
+	ErrorCode    int    `json:"errorCode,string"`
+	ErrorMessage string `json:"errorMessage,string,omitempty"`
 	Bindings     []struct {
 		BindingId  string `json:"bindingId,omitempty"`
 		MaskedPan  string `json:"maskedPan,omitempty"`
