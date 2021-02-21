@@ -752,7 +752,7 @@ func TestClient_BindCard(t *testing.T) {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
 			"ErrorCode":    Equal(2),
-			"ErrorMessage": Equal("Binding is active"),
+			"ErrorMessage": Equal(Binding is active),
 		})))
 	})
 
