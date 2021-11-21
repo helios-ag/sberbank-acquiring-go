@@ -1,9 +1,8 @@
 [![LICENSE](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
-[![Build Status](https://travis-ci.com/helios-ag/sberbank-acquiring-go.svg?branch=master)](https://travis-ci.com/helios-ag/sberbank-acquiring-go)
+[![Go](https://github.com/helios-ag/sberbank-acquiring-go/actions/workflows/go.yml/badge.svg)](https://github.com/helios-ag/sberbank-acquiring-go/actions/workflows/go.yml)
 [![codecov](https://codecov.io/gh/helios-ag/sberbank-acquiring-go/branch/master/graph/badge.svg)](https://codecov.io/gh/helios-ag/sberbank-acquiring-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/helios-ag/sberbank-acquiring-go)](https://goreportcard.com/report/github.com/helios-ag/sberbank-acquiring-go)
 [![Godocs](https://img.shields.io/badge/golang-documentation-blue.svg)](https://godoc.org/github.com/helios-ag/sberbank-acquiring-go)
-[![CircleCI](https://circleci.com/gh/helios-ag/sberbank-acquiring-go.svg?style=svg)](https://circleci.com/gh/helios-ag/sberbank-acquiring-go)
 # Sberbank Acquiring API Wrapper
 
 ## Описание
