@@ -20,21 +20,139 @@ import (
 // "Description" check API Docs
 // "PageView" custom pageview
 // "MerchantLogin" check API Docs
+// "ExpirationDate" check API Docs
 // "BindingID" used in binding API
+// "OrderBundle" OrderBundle data (cart to be consistent with 84 law and OFD 1.05)
+// "AdditionalOfdParams" AdditionalOfdParams extra data (for OFD 1.05 and up)
 // "Features" used in some endpoints of API
 // "JSONParams" different json data that can be stored on api side
 type Order struct {
-	OrderNumber    string
-	Amount         int
-	ReturnURL      string
-	FailURL        string
-	Description    string
-	PageView       string
-	MerchantLogin  string
-	ExpirationDate string
-	BindingID      string
-	Features       string
-	JSONParams     map[string]string
+	OrderNumber         string
+	Amount              int
+	ReturnURL           string
+	FailURL             string
+	Description         string
+	PageView            string
+	MerchantLogin       string
+	ExpirationDate      string
+	BindingID           string
+	OrderBundle         OrderBundle
+	AdditionalOfdParams AdditionalOfdParams
+	Features            string
+	JSONParams          map[string]string
+}
+
+type AdditionalOfdParams struct {
+	AgentInfoType                   int      `json:"agent_info.type"`
+	AgentInfoPayingOperation        string   `json:"agent_info.paying.operation,omitempty"`
+	AgentInfoPayingPhones           []string `json:"agent_info.paying.phones,omitempty"`
+	AgentInfoPaymentsOperatorPhones []string `json:"agent_info.paymentsOperator.phones,omitempty"`
+	AgentInfoMTOperatorAddress      string   `json:"agent_info.MTOperator.address,omitempty"`
+	AgentInfoMTOperatorInn          string   `json:"agent_info.MTOperator.inn,omitempty"`
+	AgentInfoMTOperatorName         string   `json:"agent_info.MTOperator.name,omitempty"`
+	AgentInfoMTOperatorPhones       []string `json:"agent_info.MTOperator.phones,omitempty"`
+	SupplierInfoPhones              []string `json:"supplier_info.phones,omitempty"`
+	Cashier                         string   `json:"cashier,omitempty"`
+	AdditionalCheckProps            string   `json:"additional_check_props,omitempty"`
+	AdditionalUserPropsName         string   `json:"additional_user_props.name,omitempty"`
+	AdditionalUserPropsValue        string   `json:"additional_user_props.value,omitempty"`
+	CashierInn                      string   `json:"cashier_inn,omitempty"`
+	ClientAddress                   string   `json:"client.address,omitempty"`
+	ClientBirthDate                 string   `json:"client.birth_date,omitempty"`
+	ClientCitizenship               string   `json:"client.citizenship,omitempty"`
+	ClientDocumentCode              string   `json:"client.document_code,omitempty"`
+	ClientPassportNumber            string   `json:"client.passport_number,omitempty"`
+	ClientMail                      string   `json:"client.email,omitempty"`
+	ClientPhone                     string   `json:"client.phone,omitempty"`
+	ClientInn                       string   `json:"client.inn,omitempty"`
+	ClientName                      string   `json:"client.name,omitempty"`
+	OperatingCheckPropsName         string   `json:"operatingCheckProps.name,omitempty"`
+	OperatingCheckPropsTimestamp    string   `json:"operatingCheckProps.timestamp,omitempty"`
+	OperatingCheckPropsValue        string   `json:"operatingCheckProps.value,omitempty"`
+	SectoralCheckPropsDate          string   `json:"sectoralCheckProps.date,omitempty"`
+	SectoralCheckPropsFederalId     string   `json:"sectoralCheckProps.federalId,omitempty"`
+	SectoralCheckPropsNumber        string   `json:"sectoralCheckProps.number,omitempty"`
+	SectoralCheckPropsValue         string   `json:"sectoralCheckProps.value,omitempty"`
+}
+
+type OrderBundle struct {
+	OrderCreationDate string          `json:"orderCreationDate,omitempty"`
+	CustomerDetails   CustomerDetails `json:"customerDetails,omitempty"`
+	CartItems         CartItems       `json:"cartItems"`
+}
+
+type CustomerDetails struct {
+	Name         string       `json:"itemDetails,omitempty"`
+	FullName     string       `json:"fullname,omitempty"`
+	Passport     string       `json:"passport,omitempty"`
+	Inn          string       `json:"inn,omitempty"`
+	Email        string       `json:"email"`
+	Phone        string       `json:"phone,omitempty"`
+	Contact      string       `json:"contact,omitempty"`
+	DeliveryInfo DeliveryInfo `json:"delivery_info,omitempty"`
+}
+
+type DeliveryInfo struct {
+	DeliveryType    string `json:"delivery_type,omitempty"`
+	DeliveryCountry string `json:"delivery_country"`
+	DeliveryCity    string `json:"delivery_city"`
+	PostAddress     string `json:"post_address"`
+}
+
+type CartItems struct {
+	Items []Item `json:"items"`
+}
+
+type Item struct {
+	PositionId     string            `json:"positionId"`
+	Name           string            `json:"name"`
+	ItemDetails    ItemDetailsParams `json:"itemDetails,omitempty"`
+	Quantity       Quantity          `json:"quantity"`
+	ItemAmount     int               `json:"itemAmount,omitempty"`
+	ItemCurrency   string            `json:"itemCurrency,omitempty"`
+	ItemCode       string            `json:"itemCode"`
+	ItemPrice      int               `json:"itemPrice"`
+	ItemAttributes ItemAttributes    `json:"itemAttributes,omitempty"`
+	Discount       Discount          `json:"discount,omitempty"`
+	AgentInterest  AgentInterest     `json:"agentInterest,omitempty"`
+	Tax            Tax               `json:"tax,omitempty"`
+}
+
+type Discount struct {
+	DiscountType  string `json:"discountType"`
+	DiscountValue string `json:"discountValue"`
+}
+
+type AgentInterest struct {
+	InterestType  string `json:"interestType"`
+	InterestValue string `json:"interestValue"`
+}
+
+type Quantity struct {
+	Value   float64 `json:"value"`
+	Measure string  `json:"measure"`
+}
+
+type ItemDetails struct {
+	ItemDetailsParams []ItemDetailsParams `json:"itemDetailsParams"`
+}
+type ItemAttributes struct {
+	Attributes []Attributes `json:"attributes"`
+}
+
+type Attributes struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+type ItemDetailsParams struct {
+	Value string `json:"value"`
+	Name  string `json:"name"`
+}
+
+type Tax struct {
+	TaxType int `json:"taxType,omitempty"`
+	TaxSum  int `json:"taxSum,omitempty"`
 }
 
 // RegisterOrder request
@@ -91,16 +209,18 @@ func validateRegisterOrder(order Order) error {
 
 func (c *Client) register(ctx context.Context, path string, order Order) (*schema.OrderResponse, *http.Response, error) {
 	body := make(map[string]string)
-	body["orderNumber"]    = order.OrderNumber
-	body["amount"]         = strconv.Itoa(order.Amount)
-	body["returnUrl"]      = order.ReturnURL
-	body["failUrl"]        = order.FailURL
-	body["description"]    = order.Description
-	body["pageView"]       = order.PageView
-	body["merchantLogin"]  = order.MerchantLogin
+	var orderBundle, _ = json.Marshal(order.OrderBundle)
+	body["orderNumber"] = order.OrderNumber
+	body["amount"] = strconv.Itoa(order.Amount)
+	body["returnUrl"] = order.ReturnURL
+	body["failUrl"] = order.FailURL
+	body["description"] = order.Description
+	body["pageView"] = order.PageView
+	body["merchantLogin"] = order.MerchantLogin
 	body["expirationDate"] = order.ExpirationDate
-	body["bindingId"]      = order.BindingID
-	body["features"]       = order.Features
+	body["bindingId"] = order.BindingID
+	body["orderBundle"] = string(orderBundle[:])
+	body["features"] = order.Features
 
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
 
@@ -129,7 +249,7 @@ func (c *Client) Deposit(ctx context.Context, order Order) (*schema.OrderRespons
 
 	body := make(map[string]string)
 	body["orderId"] = order.OrderNumber
-	body["amount"]  = strconv.Itoa(order.Amount)
+	body["amount"] = strconv.Itoa(order.Amount)
 
 	var orderResponse schema.OrderResponse
 	req, err := c.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
