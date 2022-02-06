@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
 	"net/http"
-	"net/url"
+	"regexp"
 	"strconv"
 )
 
@@ -76,27 +78,55 @@ type AdditionalOfdParams struct {
 }
 
 type OrderBundle struct {
-	OrderCreationDate string          `json:"orderCreationDate,omitempty"`
-	CustomerDetails   CustomerDetails `json:"customerDetails,omitempty"`
-	CartItems         CartItems       `json:"cartItems"`
+	OrderCreationDate string           `json:"orderCreationDate,omitempty"`
+	CustomerDetails   *CustomerDetails `json:"customerDetails,omitempty"`
+	CartItems         CartItems        `json:"cartItems"`
+}
+
+func (orderBundle OrderBundle) Validate() error {
+	return validation.ValidateStruct(&orderBundle,
+		validation.Field(&orderBundle.OrderCreationDate, validation.Length(1, 21)),
+		validation.Field(&orderBundle.CustomerDetails),
+	)
 }
 
 type CustomerDetails struct {
-	Name         string       `json:"itemDetails,omitempty"`
-	FullName     string       `json:"fullname,omitempty"`
-	Passport     string       `json:"passport,omitempty"`
-	Inn          string       `json:"inn,omitempty"`
-	Email        string       `json:"email"`
+	Contact  string `json:"contact,omitempty"`
+	Email    string `json:"email"`
+	FullName string `json:"fullName,omitempty"`
+	Passport string `json:"passport,omitempty"`
+	Inn      string `json:"inn,omitempty"`
+
 	Phone        string       `json:"phone,omitempty"`
-	Contact      string       `json:"contact,omitempty"`
 	DeliveryInfo DeliveryInfo `json:"delivery_info,omitempty"`
 }
 
+func (customerDetails CustomerDetails) Validate() error {
+	return validation.ValidateStruct(&customerDetails,
+		validation.Field(&customerDetails.Contact, validation.Length(1, 40)),
+		validation.Field(&customerDetails.Email, validation.Required, is.Email, validation.Length(1, 40)),
+		validation.Field(&customerDetails.Phone, validation.Required, validation.Length(1, 40), validation.Match(regexp.MustCompile("^(('+7'|7|8)?([0-9]){10})$"))),
+		validation.Field(&customerDetails.FullName, validation.Length(1, 100)),
+		validation.Field(&customerDetails.Passport, validation.Length(1, 100)),
+		validation.Field(&customerDetails.Inn, validation.RuneLength(1, 12)),
+		validation.Field(&customerDetails.DeliveryInfo),
+	)
+}
+
 type DeliveryInfo struct {
-	DeliveryType    string `json:"delivery_type,omitempty"`
-	DeliveryCountry string `json:"delivery_country"`
-	DeliveryCity    string `json:"delivery_city"`
-	PostAddress     string `json:"post_address"`
+	DeliveryType    *string `json:"delivery_type,omitempty"`
+	DeliveryCountry string  `json:"delivery_country"`
+	DeliveryCity    string  `json:"delivery_city"`
+	PostAddress     string  `json:"post_address"`
+}
+
+func (deliveryInfo DeliveryInfo) Validate() error {
+	return validation.ValidateStruct(&deliveryInfo,
+		validation.Field(&deliveryInfo.DeliveryType, validation.Length(1, 20)),
+		validation.Field(&deliveryInfo.DeliveryCountry, validation.Required, validation.Length(1, 20)),
+		validation.Field(&deliveryInfo.DeliveryCity, validation.Required, validation.Length(1, 40)),
+		validation.Field(&deliveryInfo.PostAddress, validation.Required, validation.Length(1, 255)),
+	)
 }
 
 type CartItems struct {
@@ -109,18 +139,37 @@ type Item struct {
 	ItemDetails    ItemDetailsParams `json:"itemDetails,omitempty"`
 	Quantity       Quantity          `json:"quantity"`
 	ItemAmount     int               `json:"itemAmount,omitempty"`
-	ItemCurrency   string            `json:"itemCurrency,omitempty"`
+	ItemCurrency   int               `json:"itemCurrency,omitempty"`
 	ItemCode       string            `json:"itemCode"`
-	ItemPrice      int               `json:"itemPrice"`
+	ItemPrice      string            `json:"itemPrice"`
 	ItemAttributes ItemAttributes    `json:"itemAttributes,omitempty"`
 	Discount       Discount          `json:"discount,omitempty"`
 	AgentInterest  AgentInterest     `json:"agentInterest,omitempty"`
 	Tax            Tax               `json:"tax,omitempty"`
 }
 
+func (item Item) Validate() error {
+	return validation.ValidateStruct(&item,
+		validation.Field(&item.PositionId, validation.Length(1, 20)),
+		validation.Field(&item.Name, validation.Required, validation.Length(1, 20)),
+		validation.Field(&item.Quantity),
+		validation.Field(&item.ItemCode, validation.Required, validation.Length(1, 100)),
+		validation.Field(&item.ItemPrice, validation.Required, validation.Length(1, 18)),
+	)
+}
+
+// Discount structure
 type Discount struct {
 	DiscountType  string `json:"discountType"`
 	DiscountValue string `json:"discountValue"`
+}
+
+// Validate Validates Discount struct
+func (discount Discount) Validate() error {
+	return validation.ValidateStruct(&discount,
+		validation.Field(&discount.DiscountType, validation.Length(1, 20)),
+		validation.Field(&discount.DiscountValue, validation.Required, validation.Length(1, 20)),
+	)
 }
 
 type AgentInterest struct {
@@ -128,16 +177,43 @@ type AgentInterest struct {
 	InterestValue string `json:"interestValue"`
 }
 
+func (agentInterest AgentInterest) Validate() error {
+	return validation.ValidateStruct(&agentInterest,
+		validation.Field(&agentInterest.InterestType, validation.Required, validation.Length(1, 20)),
+		validation.Field(&agentInterest.InterestValue, validation.Required, validation.Length(1, 20)),
+	)
+}
+
 type Quantity struct {
-	Value   float64 `json:"value"`
-	Measure string  `json:"measure"`
+	Value   int    `json:"value"`
+	Measure string `json:"measure"`
+}
+
+func (quantity Quantity) Validate() error {
+	return validation.ValidateStruct(&quantity,
+		validation.Field(&quantity.Value, validation.Required, validation.Length(1, 18)),
+		validation.Field(&quantity.Measure, validation.Required, validation.Length(1, 20)),
+	)
 }
 
 type ItemDetails struct {
 	ItemDetailsParams []ItemDetailsParams `json:"itemDetailsParams"`
 }
+
+func (itemDetails ItemDetails) Validate() error {
+	return validation.ValidateStruct(&itemDetails,
+		validation.Field(&itemDetails.ItemDetailsParams),
+	)
+}
+
 type ItemAttributes struct {
 	Attributes []Attributes `json:"attributes"`
+}
+
+func (itemAttributes ItemAttributes) Validate() error {
+	return validation.ValidateStruct(&itemAttributes,
+		validation.Field(&itemAttributes.Attributes),
+	)
 }
 
 type Attributes struct {
@@ -145,14 +221,34 @@ type Attributes struct {
 	Value string `json:"value"`
 }
 
+func (attributes Attributes) Validate() error {
+	return validation.ValidateStruct(&attributes,
+		validation.Field(&attributes.Name, validation.Required),
+	)
+}
+
 type ItemDetailsParams struct {
 	Value string `json:"value"`
 	Name  string `json:"name"`
 }
 
+func (itemDetailsParams ItemDetailsParams) Validate() error {
+	return validation.ValidateStruct(&itemDetailsParams,
+		validation.Field(&itemDetailsParams.Value, validation.Required, validation.Length(1, 255)),
+		validation.Field(&itemDetailsParams.Name, validation.Required, validation.Length(1, 255)),
+	)
+}
+
 type Tax struct {
 	TaxType int `json:"taxType,omitempty"`
 	TaxSum  int `json:"taxSum,omitempty"`
+}
+
+func (tax Tax) Validate() error {
+	return validation.ValidateStruct(&tax,
+		validation.Field(&tax.TaxType, validation.Length(1, 2)),
+		validation.Field(&tax.TaxSum, validation.Length(1, 18)),
+	)
 }
 
 // RegisterOrder request
@@ -184,24 +280,17 @@ func (c *Client) RegisterOrderPreAuth(ctx context.Context, order Order) (*schema
 }
 
 func validateRegisterOrder(order Order) error {
-	if order.ReturnURL == "" {
-		return fmt.Errorf("return url must be set")
-	}
 
-	if _, err := url.Parse(order.ReturnURL); err != nil {
-		return fmt.Errorf("unable to parse ReturnUrl: %v", err)
-	}
+	err := validation.ValidateStruct(&order,
+		validation.Field(&order.OrderNumber, validation.Required, validation.Length(0, 30)),
+		validation.Field(&order.ReturnURL, validation.Required, is.URL),
+		validation.Field(&order.FailURL, validation.Required, is.URL),
+		validation.Field(&order.FailURL, validation.Required, is.URL),
+		validation.Field(&order.FailURL, validation.Required, is.URL),
+	)
 
-	if order.OrderNumber != "" {
-		if len(order.OrderNumber) > 30 {
-			return fmt.Errorf("orderNumber is too long (>30)")
-		}
-	}
-
-	if order.FailURL != "" {
-		if _, err := url.Parse(order.FailURL); err != nil {
-			return fmt.Errorf("unable to parse FailUrl: %v", err)
-		}
+	if err != nil {
+		return err
 	}
 
 	return nil
