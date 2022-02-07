@@ -44,6 +44,14 @@ type Order struct {
 	JSONParams          map[string]string
 }
 
+func (order Order) Validate() error {
+	return validation.ValidateStruct(&order,
+		validation.Field(&order.ReturnURL, validation.Required, is.URL),
+		validation.Field(&order.OrderNumber, validation.Required, validation.Length(1, 30)),
+		validation.Field(&order.FailURL, is.URL),
+	)
+}
+
 type AdditionalOfdParams struct {
 	AgentInfoType                   int      `json:"agent_info.type"`
 	AgentInfoPayingOperation        string   `json:"agent_info.paying.operation,omitempty"`
@@ -256,7 +264,7 @@ func (tax Tax) Validate() error {
 func (c *Client) RegisterOrder(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
 	path := endpoints.Register
 
-	if err := validateRegisterOrder(order); err != nil {
+	if err := order.Validate(); err != nil {
 		return nil, nil, err
 	}
 
@@ -270,30 +278,13 @@ func (c *Client) RegisterOrder(ctx context.Context, order Order) (*schema.OrderR
 func (c *Client) RegisterOrderPreAuth(ctx context.Context, order Order) (*schema.OrderResponse, *http.Response, error) {
 	path := endpoints.RegisterPreAuth
 
-	if err := validateRegisterOrder(order); err != nil {
+	if err := order.Validate(); err != nil {
 		return nil, nil, err
 	}
 
 	orderResponse, result, err := c.register(ctx, path, order)
 
 	return orderResponse, result, err
-}
-
-func validateRegisterOrder(order Order) error {
-
-	err := validation.ValidateStruct(&order,
-		validation.Field(&order.OrderNumber, validation.Required, validation.Length(0, 30)),
-		validation.Field(&order.ReturnURL, validation.Required, is.URL),
-		validation.Field(&order.FailURL, validation.Required, is.URL),
-		validation.Field(&order.FailURL, validation.Required, is.URL),
-		validation.Field(&order.FailURL, validation.Required, is.URL),
-	)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (c *Client) register(ctx context.Context, path string, order Order) (*schema.OrderResponse, *http.Response, error) {
@@ -531,8 +522,15 @@ func (c *Client) UpdateSSLCardList(ctx context.Context, mdorder string, jsonPara
 // Binding is used to make binding related requests
 type Binding struct {
 	bindingID  string
-	newExpiry  int
+	newExpiry  string
 	JSONParams map[string]string
+}
+
+func (binding Binding) Validate() error {
+	return validation.ValidateStruct(&binding,
+		validation.Field(&binding.bindingID, validation.Required),
+		validation.Field(&binding.newExpiry, validation.Match(regexp.MustCompile("^[0-9]{6}$"))),
+	)
 }
 
 // BindCard request
@@ -552,7 +550,7 @@ func (c *Client) UnBindCard(ctx context.Context, binding Binding) (*schema.Respo
 }
 
 var bind = func(ctx context.Context, client *Client, path string, binding Binding) (*schema.Response, *http.Response, error) {
-	if err := validateBind(binding); err != nil {
+	if err := binding.Validate(); err != nil {
 		return nil, nil, err
 	}
 
@@ -567,35 +565,15 @@ var bind = func(ctx context.Context, client *Client, path string, binding Bindin
 func (c *Client) ExtendBinding(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
 	path := endpoints.ExtendBinding
 
-	if err := validateBind(binding); err != nil {
-		return nil, nil, err
-	}
-
-	if err := validateExpiry(binding); err != nil {
+	if err := binding.Validate(); err != nil {
 		return nil, nil, err
 	}
 
 	body := make(map[string]string)
 	body["bindingId"] = binding.bindingID
-	body["newExpiry"] = strconv.Itoa(binding.newExpiry)
+	body["newExpiry"] = binding.newExpiry
 
 	return c.bind(ctx, path, body, binding.JSONParams)
-}
-
-func validateBind(binding Binding) error {
-	if binding.bindingID == "" {
-		return fmt.Errorf("bindingId can't be empty")
-	}
-
-	return nil
-}
-
-func validateExpiry(binding Binding) error {
-	if len(strconv.Itoa(binding.newExpiry)) != 6 {
-		return fmt.Errorf("new expiry date should have 6 digits")
-	}
-
-	return nil
 }
 
 func (c *Client) bind(ctx context.Context, path string, body map[string]string, jsonParams map[string]string) (*schema.Response, *http.Response, error) {

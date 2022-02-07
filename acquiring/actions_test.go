@@ -44,7 +44,7 @@ var NewRequestStub = func(
 	method,
 	urlPath string,
 	data interface{},
-	) (*http.Request, error) {
+) (*http.Request, error) {
 	return nil, fmt.Errorf("error happened")
 }
 
@@ -61,7 +61,7 @@ func TestClient_RegisterOrder(t *testing.T) {
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("return url must be set"))
+		Expect(err.Error()).To(ContainSubstring("ReturnURL: cannot be blank"))
 	})
 
 	t.Run("Validate return URL", func(t *testing.T) {
@@ -76,7 +76,7 @@ func TestClient_RegisterOrder(t *testing.T) {
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("unable to parse"))
+		Expect(err.Error()).To(ContainSubstring("must be a valid URL"))
 	})
 
 	t.Run("Validate order number", func(t *testing.T) {
@@ -91,7 +91,7 @@ func TestClient_RegisterOrder(t *testing.T) {
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("orderNumber is too long"))
+		Expect(err.Error()).To(ContainSubstring("OrderNumber: the length must be between 1 and 30"))
 	})
 
 	t.Run("Validate failUrl", func(t *testing.T) {
@@ -107,7 +107,7 @@ func TestClient_RegisterOrder(t *testing.T) {
 
 		_, _, err := client.RegisterOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("unable to parse FailUrl"))
+		Expect(err.Error()).To(ContainSubstring("FailURL: must be a valid URL"))
 	})
 
 	t.Run("Test Register Order response Mapping", func(t *testing.T) {
@@ -154,7 +154,7 @@ func TestClient_RegisterPreAuthOrder(t *testing.T) {
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("return url must be set"))
+		Expect(err.Error()).To(ContainSubstring("ReturnURL: cannot be blank"))
 	})
 
 	t.Run("Validate return URL", func(t *testing.T) {
@@ -169,7 +169,7 @@ func TestClient_RegisterPreAuthOrder(t *testing.T) {
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("unable to parse"))
+		Expect(err.Error()).To(ContainSubstring("must be a valid URL"))
 	})
 
 	t.Run("Validate order number", func(t *testing.T) {
@@ -184,7 +184,7 @@ func TestClient_RegisterPreAuthOrder(t *testing.T) {
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("orderNumber is too long"))
+		Expect(err.Error()).To(ContainSubstring("OrderNumber: the length must be between 1 and 30"))
 	})
 
 	t.Run("Validate failUrl", func(t *testing.T) {
@@ -200,7 +200,7 @@ func TestClient_RegisterPreAuthOrder(t *testing.T) {
 
 		_, _, err := client.RegisterOrderPreAuth(context.Background(), order)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("unable to parse FailUrl"))
+		Expect(err.Error()).To(ContainSubstring("FailURL: must be a valid URL"))
 	})
 
 	t.Run("Test Preauth Register Order response Mapping", func(t *testing.T) {
@@ -492,7 +492,7 @@ func TestClient_RefundOrder(t *testing.T) {
 
 		order := Order{
 			OrderNumber: "9231a838-ac68-4a3e",
-			Amount: 1,
+			Amount:      1,
 		}
 
 		response, _, err := server.Client.RefundOrder(context.Background(), order)
@@ -509,7 +509,7 @@ func TestClient_RefundOrder(t *testing.T) {
 
 		order := Order{
 			OrderNumber: "9231a838-ac68-4a3e",
-			Amount: 1,
+			Amount:      1,
 		}
 		_, _, err := server.Client.RefundOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
@@ -524,7 +524,7 @@ func TestClient_RefundOrder(t *testing.T) {
 
 		order := Order{
 			OrderNumber: "9231a838-ac68-4a3e",
-			Amount: 1,
+			Amount:      1,
 		}
 		_, _, err := server.Client.RefundOrder(context.Background(), order)
 		Expect(err).To(HaveOccurred())
@@ -541,7 +541,7 @@ func TestClient_RefundOrder(t *testing.T) {
 		})
 		order := Order{
 			OrderNumber: "1234567890123456",
-			Amount: 1,
+			Amount:      1,
 		}
 
 		_, _, err := server.Client.RefundOrder(context.Background(), order)
@@ -550,12 +550,12 @@ func TestClient_RefundOrder(t *testing.T) {
 	})
 }
 
-func TestClient_ValidateRefundOrder(t *testing.T)  {
+func TestClient_ValidateRefundOrder(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("", func(t *testing.T) {
 		order := Order{
 			OrderNumber: "123",
-			Amount: 1,
+			Amount:      1,
 		}
 		err := validateRefundOrder(order)
 		Expect(err).ToNot(HaveOccurred())
@@ -590,7 +590,7 @@ func TestClient_GetOrderStatus(t *testing.T) {
 
 		order := Order{
 			OrderNumber: "9231a838-ac68-4a3e",
-			Amount: 1,
+			Amount:      1,
 		}
 		_, _, err := server.Client.GetOrderStatus(context.Background(), order)
 		Expect(err).To(HaveOccurred())
@@ -605,7 +605,7 @@ func TestClient_GetOrderStatus(t *testing.T) {
 
 		order := Order{
 			OrderNumber: "9231a838-ac68-4a3e",
-			Amount: 1,
+			Amount:      1,
 		}
 		_, _, err := server.Client.GetOrderStatus(context.Background(), order)
 		Expect(err).To(HaveOccurred())
@@ -622,7 +622,7 @@ func TestClient_GetOrderStatus(t *testing.T) {
 		})
 		order := Order{
 			OrderNumber: "1234567890123456",
-			Amount: 1,
+			Amount:      1,
 		}
 
 		_, _, err := server.Client.GetOrderStatus(context.Background(), order)
@@ -639,12 +639,12 @@ func TestClient_GetOrderStatus(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.OrderStatusResponse{
 				OrderNumber: "70906e55-7114-41d6-8332-4609dc6590f4",
-				ErrorCode: 0,
+				ErrorCode:   0,
 			})
 		})
 		order := Order{
 			OrderNumber: "1234567890123456",
-			Amount: 1,
+			Amount:      1,
 		}
 
 		_, _, err := server.Client.GetOrderStatus(context.Background(), order)
@@ -728,7 +728,7 @@ func TestClient_BindCard(t *testing.T) {
 
 		_, _, err := client.BindCard(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
+		Expect(err.Error()).To(ContainSubstring("bindingID: cannot be blank"))
 	})
 
 	t.Run("Test Binding response mapping", func(t *testing.T) {
@@ -751,8 +751,8 @@ func TestClient_BindCard(t *testing.T) {
 		response, _, err := server.Client.BindCard(context.Background(), binding)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
-			"ErrorCode":    Equal(2),
-			"ErrorMessage": Equal("Binding is active"),
+			"ErrorCode": Equal(2),
+			//"ErrorMessage": Equal("Binding is active"),
 		})))
 	})
 
@@ -765,7 +765,7 @@ func TestClient_BindCard(t *testing.T) {
 
 		_, _, err := client.UnBindCard(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
+		Expect(err.Error()).To(ContainSubstring("bindingID: cannot be blank"))
 	})
 
 	t.Run("Test validate ExtendBinding with empty value", func(t *testing.T) {
@@ -777,7 +777,7 @@ func TestClient_BindCard(t *testing.T) {
 
 		_, _, err := client.ExtendBinding(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
+		Expect(err.Error()).To(ContainSubstring("bindingID: cannot be blank"))
 	})
 
 	t.Run("Test validate ExtendBinding Expiry", func(t *testing.T) {
@@ -785,11 +785,11 @@ func TestClient_BindCard(t *testing.T) {
 
 		binding := Binding{
 			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			newExpiry: "123",
 		}
-
 		_, _, err := client.ExtendBinding(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("new expiry date should have 6 digits"))
+		Expect(err.Error()).To(ContainSubstring("newExpiry: must be in a valid format."))
 	})
 
 	t.Run("Test ExtendBinding is ok", func(t *testing.T) {
@@ -807,7 +807,7 @@ func TestClient_BindCard(t *testing.T) {
 
 		binding := Binding{
 			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
-			newExpiry: 123123,
+			newExpiry: "123123",
 		}
 		_, _, err := server.Client.ExtendBinding(context.Background(), binding)
 		// We dont care what underlying error happened
@@ -856,9 +856,9 @@ func TestClient_ValidateBind(t *testing.T) {
 		binding := Binding{
 			bindingID: "",
 		}
-		err := validateBind(binding)
+		err := binding.Validate()
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("bindingId can't be empty"))
+		Expect(err.Error()).To(ContainSubstring("bindingID: cannot be blank"))
 	})
 }
 
@@ -866,21 +866,22 @@ func TestClient_ValidateExpiry(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test expiry is ok", func(t *testing.T) {
 		binding := Binding{
-			newExpiry: 123123,
+			bindingID: "123",
+			newExpiry: "123123",
 		}
-		err := validateExpiry(binding)
+		err := binding.Validate()
 		Expect(err).ToNot(HaveOccurred())
 	})
 }
 
-func TestClient_Bind(t *testing.T)  {
+func TestClient_Bind(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test NewRestRequest", func(t *testing.T) {
 		server := newServer()
 		defer server.Teardown()
 		binding := Binding{
 			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
-			newExpiry: 123123,
+			newExpiry: "123123",
 		}
 		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -895,7 +896,7 @@ func TestClient_Bind(t *testing.T)  {
 		defer server.Teardown()
 		binding := Binding{
 			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
-			newExpiry: 123123,
+			newExpiry: "123123",
 		}
 		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -970,7 +971,7 @@ func TestClient_GetReceiptStatus(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.OrderStatusResponse{
 				OrderNumber: "70906e55-7114-41d6-8332-4609dc6590f4",
-				ErrorCode: 0,
+				ErrorCode:   0,
 			})
 		})
 
@@ -1313,7 +1314,7 @@ func TestClient_UpdateSSLCardList(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.OrderStatusResponse{
 				OrderNumber: "70906e55-7114-41d6-8332-4609dc6590f4",
-				ErrorCode: 0,
+				ErrorCode:   0,
 			})
 		})
 
@@ -1359,7 +1360,7 @@ func TestClient_GetBindings(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.OrderStatusResponse{
 				OrderNumber: "70906e55-7114-41d6-8332-4609dc6590f4",
-				ErrorCode: 0,
+				ErrorCode:   0,
 			})
 		})
 

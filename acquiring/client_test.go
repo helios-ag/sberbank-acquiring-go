@@ -151,7 +151,7 @@ func TestErrorFromResponse(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Expect application/json", func(t *testing.T) {
 		resp := http.Response{
-			Body: ioutil.NopCloser(bytes.NewBufferString("Hello World")),
+			Body:   ioutil.NopCloser(bytes.NewBufferString("Hello World")),
 			Header: make(http.Header, 0),
 		}
 		resp.Header.Set("Content-Type", "application/json")
@@ -162,7 +162,7 @@ func TestErrorFromResponse(t *testing.T) {
 
 	t.Run("Expect wrong json", func(t *testing.T) {
 		resp := http.Response{
-			Body: ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
+			Body:   ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
 			Header: make(http.Header, 0),
 		}
 		resp.Header.Set("Content-Type", "application/json")
@@ -173,7 +173,7 @@ func TestErrorFromResponse(t *testing.T) {
 
 	t.Run("Expect wrong json header", func(t *testing.T) {
 		resp := http.Response{
-			Body: ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
+			Body:   ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
 			Header: make(http.Header, 0),
 		}
 		resp.Header.Set("Content-Type", "application_json")
@@ -184,11 +184,11 @@ func TestErrorFromResponse(t *testing.T) {
 
 	t.Run("Expect Error", func(t *testing.T) {
 		resp := http.Response{
-			Body: ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
+			Body:   ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
 			Header: make(http.Header, 0),
 		}
 		resp.Header.Set("Content-Type", "application/json")
-		body := []byte(`{"errorCode": 5, "errorMessage": "Ошибка"}`)
+		body := []byte(`{"errorCode": "5", "errorMessage": "Ошибка"}`)
 		err := errorFromResponse(&resp, body)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("Ошибка"))
@@ -196,7 +196,7 @@ func TestErrorFromResponse(t *testing.T) {
 
 	t.Run("Dont expect Error", func(t *testing.T) {
 		resp := http.Response{
-			Body: ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
+			Body:   ioutil.NopCloser(bytes.NewBufferString("{\"test\": test\"}")),
 			Header: make(http.Header, 0),
 		}
 		resp.Header.Set("Content-Type", "application/json")
