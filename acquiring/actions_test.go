@@ -256,7 +256,6 @@ func TestClient_register(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 		order := Order{
 			OrderNumber: "1234567890123456",
@@ -330,7 +329,6 @@ func TestClient_Deposit(t *testing.T) {
 
 			server.Mux.HandleFunc(endpoints.Deposit, func(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Bad Request", http.StatusBadRequest)
-				return
 			})
 			order := Order{
 				OrderNumber: "1234567890123456",
@@ -432,7 +430,6 @@ func TestClient_ReverseOrder(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.Reverse, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 		order := Order{
 			OrderNumber: "1234567890123456",
@@ -537,7 +534,6 @@ func TestClient_RefundOrder(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.Refund, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 		order := Order{
 			OrderNumber: "1234567890123456",
@@ -618,7 +614,6 @@ func TestClient_GetOrderStatus(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.GetOrderStatusExtended, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 		order := Order{
 			OrderNumber: "1234567890123456",
@@ -697,7 +692,6 @@ func TestClient_VerifyEnrollment(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.VerifyEnrollment, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		_, _, err := server.Client.VerifyEnrollment(context.Background(), "411111111111111")
@@ -885,7 +879,6 @@ func TestClient_Bind(t *testing.T) {
 		}
 		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 		_, _, err := bind(context.Background(), server.Client, "wrong\\:url", binding)
 		Expect(err).To(HaveOccurred())
@@ -900,7 +893,6 @@ func TestClient_Bind(t *testing.T) {
 		}
 		server.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 		_, _, err := bind(context.Background(), server.Client, endpoints.Register, binding)
 		Expect(err).To(HaveOccurred())
@@ -935,7 +927,6 @@ func TestClient_GetReceiptStatus(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.GetReceiptStatus, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		receipt := ReceiptStatusRequest{
@@ -1045,7 +1036,6 @@ func TestClient_PayWithApplePay(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.ApplePay, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		req := ApplePaymentRequest{
@@ -1066,7 +1056,6 @@ func TestClient_PayWithApplePay(t *testing.T) {
 		newRequest = NewRequestStub
 		server.Mux.HandleFunc(endpoints.ApplePay, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		req := ApplePaymentRequest{
@@ -1143,7 +1132,6 @@ func TestClient_PayWithGooglePay(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.GooglePay, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		req := GooglePaymentRequest{
@@ -1164,7 +1152,6 @@ func TestClient_PayWithGooglePay(t *testing.T) {
 		newRequest = NewRequestStub
 		server.Mux.HandleFunc(endpoints.GooglePay, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		req := GooglePaymentRequest{
@@ -1240,7 +1227,6 @@ func TestClient_PayWithSamsungPay(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.SamsungPay, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		req := SamsungPaymentRequest{
@@ -1261,7 +1247,6 @@ func TestClient_PayWithSamsungPay(t *testing.T) {
 		newRequest = NewRequestStub
 		server.Mux.HandleFunc(endpoints.SamsungPay, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		req := SamsungPaymentRequest{
@@ -1285,7 +1270,6 @@ func TestClient_UpdateSSLCardList(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.UpdateSSLCardList, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		_, _, err := server.Client.UpdateSSLCardList(context.Background(), "123123", nil)
@@ -1332,7 +1316,6 @@ func TestClient_GetBindings(t *testing.T) {
 
 		server.Mux.HandleFunc(endpoints.GetBindings, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		})
 
 		_, _, err := server.Client.GetBindings(context.Background(), "123123", nil)
