@@ -541,7 +541,7 @@ func TestClient_RefundOrder(t *testing.T) {
 		}
 
 		_, _, err := server.Client.RefundOrder(context.Background(), order)
-		// We dont care what underlying error happened
+		// We don't care what underlying error happened
 		Expect(err).To(HaveOccurred())
 	})
 }
@@ -1256,7 +1256,7 @@ func TestClient_PayWithSamsungPay(t *testing.T) {
 		}
 
 		_, _, err := server.Client.PayWithSamsungPay(context.Background(), req)
-		// We dont care what underlying error happened
+		// We don't care what underlying error happened
 		Expect(err).To(HaveOccurred())
 		newRequest = oldNewRequest
 	})
