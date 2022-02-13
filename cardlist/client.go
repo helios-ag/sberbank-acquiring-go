@@ -15,7 +15,13 @@ type Client struct {
 
 // UpdateSSLCardList request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:updateSSLCardList
-func (c *Client) UpdateSSLCardList(ctx context.Context, mdorder string, jsonParams map[string]string) (*schema.Response, *http.Response, error) {
+func UpdateSSLCardList(ctx context.Context, mdorder string, jsonParams map[string]string) (*schema.Response, *http.Response, error) {
+	return getClient().UpdateSSLCardList(ctx, mdorder, jsonParams)
+}
+
+// UpdateSSLCardList request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:updateSSLCardList
+func (c Client) UpdateSSLCardList(ctx context.Context, mdorder string, jsonParams map[string]string) (*schema.Response, *http.Response, error) {
 	path := endpoints.UpdateSSLCardList
 	body := make(map[string]string)
 	body["mdorder"] = mdorder
@@ -33,4 +39,8 @@ func (c *Client) UpdateSSLCardList(ctx context.Context, mdorder string, jsonPara
 	_ = json.NewDecoder(result.Body).Decode(&response)
 
 	return &response, result, err
+}
+
+func getClient() Client {
+	return Client{acquiring.GetAPI()}
 }
