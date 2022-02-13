@@ -18,7 +18,6 @@ func (server *Server) Teardown() {
 	server.Mux = nil
 }
 
-
 func NewServer() Server {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
