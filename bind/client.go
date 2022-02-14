@@ -32,10 +32,22 @@ func (binding Binding) Validate() error {
 
 // BindCard request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:bindcard
+func BindCard(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
+	return getClient().BindCard(ctx, binding)
+}
+
+// BindCard request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:bindcard
 func (c Client) BindCard(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
 	path := endpoints.BindCard
 
 	return bind(ctx, c, path, binding)
+}
+
+// UnBindCard request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:unbindcard
+func UnBindCard(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
+	return getClient().UnBindCard(ctx, binding)
 }
 
 // UnBindCard request
@@ -55,6 +67,12 @@ var bind = func(ctx context.Context, client Client, path string, binding Binding
 	body["bindingId"] = binding.bindingID
 
 	return client.bind(ctx, path, body, binding.JSONParams)
+}
+
+// ExtendBinding request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:extendbinding
+func ExtendBinding(ctx context.Context, binding Binding) (*schema.Response, *http.Response, error) {
+	return getClient().ExtendBinding(ctx, binding)
 }
 
 // ExtendBinding request
@@ -114,4 +132,8 @@ func (c Client) GetBindings(ctx context.Context, clientId string, jsonParams map
 	_ = json.NewDecoder(result.Body).Decode(&response)
 
 	return &response, result, err
+}
+
+func getClient() Client {
+	return Client{acquiring.GetAPI()}
 }
