@@ -109,6 +109,12 @@ func (c Client) bind(ctx context.Context, path string, body map[string]string, j
 
 // GetBindings request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getbindings
+func GetBindings(ctx context.Context, clientId string, jsonParams map[string]string) (*schema.BindingsResponse, *http.Response, error) {
+	return getClient().GetBindings(ctx, clientId, jsonParams)
+}
+
+// GetBindings request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getbindings
 func (c Client) GetBindings(ctx context.Context, clientId string, jsonParams map[string]string) (*schema.BindingsResponse, *http.Response, error) {
 	path := endpoints.GetBindings
 
