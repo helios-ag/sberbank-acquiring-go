@@ -305,6 +305,7 @@ func (c Client) RegisterOrderPreAuth(ctx context.Context, order Order) (*schema.
 	return orderResponse, result, err
 }
 
+//
 func (c Client) register(ctx context.Context, path string, order Order) (*schema.OrderResponse, *http.Response, error) {
 	body := make(map[string]string)
 	var orderBundle, _ = json.Marshal(order.OrderBundle)
@@ -320,7 +321,7 @@ func (c Client) register(ctx context.Context, path string, order Order) (*schema
 	body["orderBundle"] = string(orderBundle[:])
 	body["features"] = order.Features
 
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, order.JSONParams)
 
 	if err != nil {
 		return nil, nil, err
