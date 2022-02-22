@@ -27,7 +27,6 @@ func prepareClient(URL string) {
 	acquiring.WithEndpoint(URL)
 }
 
-
 var NewRestRequestStub = func(
 	c *acquiring.Client,
 	ctx context.Context,
