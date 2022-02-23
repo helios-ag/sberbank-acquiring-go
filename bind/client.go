@@ -93,7 +93,7 @@ func (c Client) ExtendBinding(ctx context.Context, binding Binding) (*schema.Res
 
 func (c Client) bind(ctx context.Context, path string, body map[string]string, jsonParams map[string]string) (*schema.Response, *http.Response, error) {
 	var response schema.Response
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, jsonParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, jsonParams)
 
 	if err != nil {
 		return nil, nil, err

@@ -53,7 +53,7 @@ func TestClient_BindCard(t *testing.T) {
 	t.Run("Test Binding response mapping", func(t *testing.T) {
 		testServer := server.NewServer()
 		defer testServer.Teardown()
-
+		prepareClient(testServer.URL)
 		testServer.Mux.HandleFunc(endpoints.BindCard, func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
@@ -70,8 +70,8 @@ func TestClient_BindCard(t *testing.T) {
 		response, _, err := BindCard(context.Background(), binding)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
-			"ErrorCode": Equal(2),
-			//"ErrorMessage": Equal("Binding is active"),
+			"ErrorCode":    Equal(2),
+			"ErrorMessage": Equal("Binding is active"),
 		})))
 	})
 
@@ -108,7 +108,7 @@ func TestClient_BindCard(t *testing.T) {
 	t.Run("Test ExtendBinding is ok", func(t *testing.T) {
 		testServer := server.NewServer()
 		defer testServer.Teardown()
-
+		prepareClient(testServer.URL)
 		testServer.Mux.HandleFunc(endpoints.ExtendBinding, func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
@@ -123,7 +123,7 @@ func TestClient_BindCard(t *testing.T) {
 			newExpiry: "123123",
 		}
 		_, _, err := ExtendBinding(context.Background(), binding)
-		// We dont care what underlying error happened
+		// We don't care what underlying error happened
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -189,26 +189,6 @@ func TestClient_ValidateExpiry(t *testing.T) {
 
 func TestClient_Bind(t *testing.T) {
 	RegisterTestingT(t)
-	t.Run("Test NewRestRequest", func(t *testing.T) {
-		testServer := server.NewServer()
-		defer testServer.Teardown()
-		prepareClient(testServer.URL)
-
-		binding := Binding{
-			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
-			newExpiry: "123123",
-		}
-		testServer.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, "Bad Request", http.StatusBadRequest)
-		})
-
-		client := Client{
-			API: nil,
-		}
-
-		_, _, err := bind(context.Background(), client, "wrong\\:url", binding)
-		Expect(err).To(HaveOccurred())
-	})
 
 	t.Run("Test Do", func(t *testing.T) {
 		testServer := server.NewServer()
