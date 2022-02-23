@@ -1,4 +1,4 @@
-package acquiring
+package sberbank_acquiring_go
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 // URLS for API endpoints
@@ -20,6 +21,14 @@ const (
 	APIURI        string = "https://securepayments.sberbank.ru"
 	APISandboxURI string = "https://3dsec.sberbank.ru"
 )
+
+// APIs are the currently supported endpoints.
+type APIs struct {
+	Api API
+	mu  sync.RWMutex
+}
+
+var apis APIs
 
 // ClientConfig is used to set client configuration
 type ClientConfig struct {
@@ -33,7 +42,13 @@ type ClientConfig struct {
 	SandboxMode        bool
 }
 
-// Client is a client to SB API
+type API interface {
+	NewRestRequest(ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error)
+	NewRequest(ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error)
+	Do(r *http.Request, v interface{}) (*http.Response, error)
+}
+
+// Client is a client to SberBank API
 type Client struct {
 	Config     *ClientConfig
 	httpClient *http.Client
@@ -54,28 +69,24 @@ type Body struct {
 type ClientOption func(*Client)
 
 // WithToken configures a Client to use the specified token for authentication.
-func WithToken(token string) ClientOption {
-	return func(client *Client) {
-		client.Config.token = token
-		client.Config.Password = ""
-		client.Config.UserName = ""
-	}
+func WithToken(token string) {
+	cfg.token = token
+	cfg.Password = ""
+	cfg.UserName = ""
 }
 
 // WithEndpoint configures a Client to use the specified API endpoint.
-func WithEndpoint(endpoint string) ClientOption {
-	return func(client *Client) {
-		client.Config.endpoint = strings.TrimRight(endpoint, "/")
-	}
+func WithEndpoint(endpoint string) {
+	cfg.endpoint = strings.TrimRight(endpoint, "/")
 }
 
 // NewRestRequest creates an HTTP request against the API with 'rest' in path. The returned request
 // is assigned with ctx and has all necessary headers set (auth, user agent, etc.).
 func (c *Client) NewRestRequest(ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error) {
-	return newRestRequest(c, ctx, method, urlPath, data, jsonParams)
+	return NewRestRequest(c, ctx, method, urlPath, data, jsonParams)
 }
 
-var newRestRequest = func(c *Client, ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error) {
+var NewRestRequest = func(c *Client, ctx context.Context, method, urlPath string, data map[string]string, jsonParams map[string]string) (*http.Request, error) {
 	uri := APIURI + urlPath
 
 	if c.Config.SandboxMode {
@@ -117,10 +128,10 @@ var newRestRequest = func(c *Client, ctx context.Context, method, urlPath string
 // NewRestRequest creates an HTTP request against the API with 'rest' in path. The returned request
 // is assigned with ctx and has all necessary headers set (auth, user agent, etc.).
 func (c *Client) NewRequest(ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error) {
-	return newRequest(c, ctx, method, urlPath, data)
+	return NewRequest(c, ctx, method, urlPath, data)
 }
 
-var newRequest = func(c *Client, ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error) {
+var NewRequest = func(c *Client, ctx context.Context, method, urlPath string, data interface{}) (*http.Request, error) {
 	if strings.Contains(urlPath, "rest") {
 		return nil, fmt.Errorf("path contains rest request, use NewRestRequest instead")
 	}
@@ -155,8 +166,8 @@ var reader = func(r io.Reader) ([]byte, error) {
 	return ioutil.ReadAll(r)
 }
 
-// Do performs an HTTP request against the API.
-func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
+// Do perform an HTTP request against the API.
+func (c Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(r)
 	if err != nil {
 		return nil, err
@@ -215,16 +226,8 @@ func (c *ClientConfig) validate() error {
 	return nil
 }
 
-// NewClient creates a new client.
-func NewClient(cfg *ClientConfig, options ...ClientOption) (*Client, error) {
-	if cfg == nil {
-		return nil, fmt.Errorf("passed in config cannot be nil")
-	}
-
-	if err := cfg.validate(); err != nil {
-		return nil, fmt.Errorf("unable to validate given config: %v", err)
-	}
-
+// newAPI creates a new client.
+func newAPI(cfg *ClientConfig, options ...ClientOption) *Client {
 	client := &Client{
 		Config:     cfg,
 		httpClient: &http.Client{},
@@ -234,5 +237,25 @@ func NewClient(cfg *ClientConfig, options ...ClientOption) (*Client, error) {
 		option(client)
 	}
 
-	return client, nil
+	return client
+}
+
+func GetAPI(options ...ClientOption) API {
+	var api API
+
+	apis.mu.RLock()
+	api = apis.Api
+	apis.mu.RUnlock()
+
+	if api != nil {
+		return api
+	}
+
+	return newAPI(&cfg, options...)
+}
+
+var cfg ClientConfig
+
+func SetConfig(config ClientConfig) {
+	cfg = config
 }
