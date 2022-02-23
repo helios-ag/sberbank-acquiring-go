@@ -5,9 +5,9 @@
 [![Godocs](https://img.shields.io/badge/golang-documentation-blue.svg)](https://godoc.org/github.com/helios-ag/sberbank-acquiring-go)
 # Sberbank Acquiring API Wrapper
 
-## Описание
+## Description
 
-## Пример
+## Example
 
 ```golang
 package main
