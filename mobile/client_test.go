@@ -159,6 +159,7 @@ func TestClient_PayWithGooglePay(t *testing.T) {
 	t.Run("Test Google Payment response mapping", func(t *testing.T) {
 		testServer := server.NewServer()
 		defer testServer.Teardown()
+		prepareClient(testServer.URL)
 
 		resp := schema.GooglePaymentResponse{
 			Success: true,
@@ -256,7 +257,7 @@ func TestClient_PayWithSamsungPay(t *testing.T) {
 	t.Run("Test Samsung Payment response mapping", func(t *testing.T) {
 		testServer := server.NewServer()
 		defer testServer.Teardown()
-
+		prepareClient(testServer.URL)
 		resp := schema.SamsungPaymentResponse{
 			Success: true,
 		}
