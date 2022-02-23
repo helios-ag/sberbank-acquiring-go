@@ -272,7 +272,9 @@ func TestClient_register(t *testing.T) {
 			Description: "Test",
 			ReturnURL:   "https://localhost",
 		}
-		client := Client{}
+		client := Client{
+			API: acquiring.GetAPI(),
+		}
 		_, _, err := client.register(context.Background(), endpoints.Register, order)
 		// We don't care what underlying error happened
 		Expect(err).To(HaveOccurred())
