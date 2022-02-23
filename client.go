@@ -136,6 +136,10 @@ var NewRequest = func(c *Client, ctx context.Context, method, urlPath string, da
 		return nil, fmt.Errorf("path contains rest request, use NewRestRequest instead")
 	}
 
+	if err := c.Config.validate(); err != nil {
+		return nil, err
+	}
+
 	uri := APIURI + urlPath
 
 	if c.Config.SandboxMode {
