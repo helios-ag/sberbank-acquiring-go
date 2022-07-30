@@ -119,7 +119,7 @@ func (customerDetails CustomerDetails) Validate() error {
 	return validation.ValidateStruct(&customerDetails,
 		validation.Field(&customerDetails.Contact, validation.Length(1, 40)),
 		validation.Field(&customerDetails.Email, validation.Required, is.Email, validation.Length(1, 40)),
-		validation.Field(&customerDetails.Phone, validation.Required, validation.Length(1, 12), validation.Match(regexp.MustCompile("^((\\+7|7|8)+([0-9]){10})$"))),
+		validation.Field(&customerDetails.Phone, validation.Required, validation.Length(1, 12), validation.Match(regexp.MustCompile(`^((\\+7|7|8)+([0-9]){10})$`))),
 		validation.Field(&customerDetails.FullName, validation.Length(1, 100)),
 		validation.Field(&customerDetails.Passport, validation.Length(1, 100)),
 		validation.Field(&customerDetails.Inn, validation.RuneLength(1, 12)),

@@ -66,5 +66,8 @@ help: ## Display this help message
 		sort | \
 		grep -v '#'
 
+staticcheck:
+	staticcheck ./...
+
 test/html:
 	go tool cover -html=coverage.out
