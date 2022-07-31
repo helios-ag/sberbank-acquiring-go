@@ -5,9 +5,48 @@
 [![Godocs](https://img.shields.io/badge/golang-documentation-blue.svg)](https://godoc.org/github.com/helios-ag/sberbank-acquiring-go)
 # Sberbank Acquiring API Wrapper
 
-## Description
+[Sberbank Acquiring API](https://securepayments.sberbank.ru/wiki/doku.php/integration:api:start) written in Go
 
-## Example
+## Installation
+
+Make sure your project is using Go Modules (it will have a `go.mod` file in its
+root if it already is):
+
+``` sh
+go mod init
+```
+
+Then, reference stripe-go in a Go program with `import`:
+
+``` go
+import (
+	"github.com/helios-ag/sberbank-acquiring-go/acquiring"
+	"github.com/helios-ag/sberbank-acquiring-go/currency"
+)
+```
+
+Run any of the normal `go` commands (`build`/`install`/`test`). The Go
+toolchain will resolve and fetch the stripe-go module automatically.
+
+Alternatively, you can also explicitly `go get` the package into a project:
+
+```bash
+go get -u github.com/helios-ag/sberbank-acquiring-go
+```
+
+## Getting started
+
+### Step 1
+Get password and username 
+
+### Step 2
+Set mode sandbox or production, currency, language
+
+### Step 3
+
+Configure client as in an example below
+
+Example below:
 
 ```golang
 package main
@@ -49,4 +88,11 @@ func main() {
 }
 
 ```
+
+### Step 4
+
+Run example `go build example.go`
+
+
+
 
