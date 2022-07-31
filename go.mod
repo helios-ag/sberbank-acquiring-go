@@ -1,6 +1,6 @@
 module github.com/helios-ag/sberbank-acquiring-go
 
-go 1.17
+go 1.18
 
 require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
@@ -8,7 +8,7 @@ require (
 )
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
 	golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069 // indirect
 	golang.org/x/text v0.3.6 // indirect
