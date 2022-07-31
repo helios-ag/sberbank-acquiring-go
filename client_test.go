@@ -210,15 +210,6 @@ func TestNewRequest(t *testing.T) {
 		Expect(err.Error()).To(ContainSubstring("path contains rest request, use NewRestRequest instead"))
 	})
 
-	t.Run("Invalid config test", func(t *testing.T) {
-		//_, err := NewClient(
-		//	&ClientConfig{},
-		//)
-		//
-		//Expect(err).To(HaveOccurred())
-		//Expect(err.Error()).To(ContainSubstring("unable to validate given config"))
-	})
-
 	t.Run("Trigger NewRequest errors", func(t *testing.T) {
 		cfg := ClientConfig{
 			UserName:           "sb-api",
@@ -259,5 +250,52 @@ func TestNewRequest(t *testing.T) {
 		_, err = GetAPI().NewRestRequest(ctx, http.MethodGet, "htt\\wrongUrl", nil, nil)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("invalid character"))
+	})
+}
+
+func TestClientConfigValidation(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Test client with empty token and user/password", func(t *testing.T) {
+		cfg := ClientConfig{
+			UserName:           "",
+			Currency:           currency.RUB,
+			token:              "",
+			Password:           "",
+			Language:           "ru",
+			SessionTimeoutSecs: 1200,
+			SandboxMode:        true,
+		}
+		err := cfg.validate()
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("Login/Password or Token can't be empty"))
+	})
+
+	t.Run("Test client with empty password", func(t *testing.T) {
+		cfg := ClientConfig{
+			UserName:           "abc",
+			Currency:           currency.RUB,
+			Password:           "",
+			Language:           "ru",
+			SessionTimeoutSecs: 1200,
+			SandboxMode:        true,
+		}
+		err := cfg.validate()
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("Login/Password or Token can't be empty"))
+	})
+
+	t.Run("Test client with wrong endpoint", func(t *testing.T) {
+		cfg := ClientConfig{
+			UserName:           "abc",
+			Currency:           currency.RUB,
+			Password:           "asd",
+			Language:           "ru",
+			SessionTimeoutSecs: 1200,
+			SandboxMode:        true,
+			endpoint:           "http//google.com",
+		}
+		err := cfg.validate()
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("unable to parse URL"))
 	})
 }

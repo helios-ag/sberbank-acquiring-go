@@ -223,7 +223,7 @@ func (c *ClientConfig) validate() error {
 		return errors.New("Login/Password or Token can't be empty")
 	}
 
-	if _, err := url.Parse(c.endpoint); err != nil {
+	if _, err := url.ParseRequestURI(c.endpoint); err != nil {
 		return fmt.Errorf("unable to parse URL: %v", err)
 	}
 
