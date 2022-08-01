@@ -210,6 +210,25 @@ func TestNewRequest(t *testing.T) {
 		Expect(err.Error()).To(ContainSubstring("path contains rest request, use NewRestRequest instead"))
 	})
 
+	t.Run("Test headers are proper", func(t *testing.T) {
+		cfg := ClientConfig{
+			UserName:           "test-api",
+			Currency:           currency.RUB,
+			Password:           "test",
+			Language:           "ru",
+			SessionTimeoutSecs: 1200,
+			SandboxMode:        true,
+			endpoint:           "https://google.com",
+		}
+
+		SetConfig(cfg)
+		ctx := context.Background()
+		req, err := GetAPI().NewRequest(ctx, http.MethodGet, endpoints.GooglePay, nil)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(req.Header.Get("Cache-Control")).To(ContainSubstring("no-cache"))
+		Expect(req.Header.Get("Content-Type")).To(ContainSubstring("application/json"))
+	})
+
 	t.Run("Trigger NewRequest errors", func(t *testing.T) {
 		cfg := ClientConfig{
 			UserName:           "sb-api",
@@ -251,6 +270,57 @@ func TestNewRequest(t *testing.T) {
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("invalid character"))
 	})
+
+	t.Run("NewRestRequest with custom endpoint", func(t *testing.T) {
+		cfg := ClientConfig{
+			UserName:           "sb-api",
+			Currency:           currency.RUB,
+			Password:           "sb",
+			Language:           "ru",
+			SessionTimeoutSecs: 1200,
+			SandboxMode:        true,
+			endpoint:           "https://google.com",
+		}
+		SetConfig(cfg)
+		ctx := context.Background()
+		_, err := GetAPI().NewRestRequest(ctx, http.MethodGet, "https://google.com", nil, nil)
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	t.Run("Trigger NewRestRequest validation error with custom endpoint", func(t *testing.T) {
+		cfg := ClientConfig{
+			UserName:           "sb-api",
+			Currency:           currency.RUB,
+			Password:           "sb",
+			Language:           "ru",
+			SessionTimeoutSecs: 1200,
+			SandboxMode:        true,
+			endpoint:           "https://google.com",
+		}
+		SetConfig(cfg)
+		ctx := context.Background()
+		_, err := GetAPI().NewRestRequest(ctx, http.MethodGet, "https://google.com", nil, nil)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("unable to parse URL"))
+	})
+
+	t.Run("NewRestRequest set proper headers", func(t *testing.T) {
+		cfg := ClientConfig{
+			UserName:           "sb-api",
+			Currency:           currency.RUB,
+			Password:           "sb",
+			Language:           "ru",
+			SessionTimeoutSecs: 1200,
+			SandboxMode:        true,
+		}
+		SetConfig(cfg)
+		ctx := context.Background()
+		req, err := GetAPI().NewRestRequest(ctx, http.MethodGet, "https://google.com", nil, nil)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(req.Header.Get("Cache-Control")).To(ContainSubstring("no-cache"))
+		Expect(req.Header.Get("Content-Type")).To(ContainSubstring("application/x-www-form-urlencoded"))
+	})
+
 }
 
 func TestClientConfigValidation(t *testing.T) {
