@@ -237,6 +237,7 @@ func TestNewRequest(t *testing.T) {
 			Language:           "ru",
 			SessionTimeoutSecs: 1200,
 			SandboxMode:        true,
+			endpoint:           APISandboxURI,
 		}
 		SetConfig(cfg)
 		ctx := context.Background()
@@ -287,23 +288,6 @@ func TestNewRequest(t *testing.T) {
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	t.Run("Trigger NewRestRequest validation error with custom endpoint", func(t *testing.T) {
-		cfg := ClientConfig{
-			UserName:           "sb-api",
-			Currency:           currency.RUB,
-			Password:           "sb",
-			Language:           "ru",
-			SessionTimeoutSecs: 1200,
-			SandboxMode:        true,
-			endpoint:           "https://google.com",
-		}
-		SetConfig(cfg)
-		ctx := context.Background()
-		_, err := GetAPI().NewRestRequest(ctx, http.MethodGet, "https://google.com", nil, nil)
-		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("unable to parse URL"))
-	})
-
 	t.Run("NewRestRequest set proper headers", func(t *testing.T) {
 		cfg := ClientConfig{
 			UserName:           "sb-api",
@@ -342,12 +326,13 @@ func TestClientConfigValidation(t *testing.T) {
 
 	t.Run("Test client with empty password", func(t *testing.T) {
 		cfg := ClientConfig{
-			UserName:           "abc",
+			UserName:           "",
 			Currency:           currency.RUB,
 			Password:           "",
 			Language:           "ru",
 			SessionTimeoutSecs: 1200,
-			SandboxMode:        true,
+			SandboxMode:        false,
+			endpoint:           APISandboxURI,
 		}
 		err := cfg.validate()
 		Expect(err).To(HaveOccurred())
