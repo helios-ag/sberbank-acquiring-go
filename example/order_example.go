@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/helios-ag/sberbank-acquiring-go/acquiring"
+	acquiring "github.com/helios-ag/sberbank-acquiring-go"
 	"github.com/helios-ag/sberbank-acquiring-go/currency"
+	"github.com/helios-ag/sberbank-acquiring-go/orders"
 )
 
 func main() {
@@ -17,16 +18,14 @@ func main() {
 		SandboxMode:        true,
 	}
 
-	client, err := acquiring.NewClient(&cfg)
-	if err != nil {
-		panic(err)
-	}
-	order := acquiring.Order{
+	acquiring.SetConfig(cfg)
+
+	order := orders.Order{
 		OrderNumber: "test",
 		Amount:      100,
 		Description: "My Order for Client",
 	}
-	result, _, err := client.RegisterOrder(context.Background(), order)
+	result, _, err := orders.RegisterOrder(context.Background(), order)
 	if err != nil {
 		panic(err)
 	}

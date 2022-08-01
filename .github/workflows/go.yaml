@@ -1,0 +1,30 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+
+      - name: Prepare
+        run: go get -t -v ./...
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: make test/codecov
+      - name: Finish
+        run: bash <(curl -s https://codecov.io/bash)
