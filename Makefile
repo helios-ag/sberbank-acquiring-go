@@ -71,3 +71,6 @@ staticcheck:
 
 test/html:
 	go tool cover -html=coverage.out
+
+updatedeps:
+	go get -t -u ./...
