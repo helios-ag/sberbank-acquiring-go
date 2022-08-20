@@ -1,0 +1,41 @@
+name: Go
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - run: go version
+
+      - name: Checkout repository
+        uses: actions/checfkout@v3
+
+      - name: Examine source code
+        run: go vet -v ./...
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: make test/codecov
+
+      - name: Finish
+        run: bash <(curl -s https://codecov.io/bash)
+
+      - name: Update Go report card
+        uses: creekorful/goreportcard-action@v1.0
