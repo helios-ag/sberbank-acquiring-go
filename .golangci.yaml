@@ -1,0 +1,5 @@
+issues:
+  exclude-rules:
+    - path: _test\.go # disable some linters on test files
+      linters:
+        - errcheck

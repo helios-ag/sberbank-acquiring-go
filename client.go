@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -167,7 +166,7 @@ var NewRequest = func(c *Client, ctx context.Context, method, urlPath string, da
 }
 
 var reader = func(r io.Reader) ([]byte, error) {
-	return ioutil.ReadAll(r)
+	return io.ReadAll(r)
 }
 
 // Do perform an HTTP request against the API.
@@ -183,7 +182,7 @@ func (c Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 		return resp, err
 	}
 	resp.Body.Close()
-	resp.Body = ioutil.NopCloser(bytes.NewReader(body))
+	resp.Body = io.NopCloser(bytes.NewReader(body))
 
 	if resp.StatusCode >= 400 && resp.StatusCode <= 599 {
 		err = errorFromResponse(resp, body)
