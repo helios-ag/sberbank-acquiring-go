@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
-	github.com/onsi/gomega v1.27.4
+	github.com/onsi/gomega v1.27.5
 )
 
 require (
