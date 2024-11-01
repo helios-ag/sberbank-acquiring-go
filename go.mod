@@ -5,7 +5,7 @@ toolchain go1.22.5
 
 require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
-	github.com/onsi/gomega v1.35.0
+	github.com/onsi/gomega v1.35.1
 )
 
 require (
