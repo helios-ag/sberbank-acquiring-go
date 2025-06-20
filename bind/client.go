@@ -18,15 +18,15 @@ type Client struct {
 
 // Binding is used to make binding related requests
 type Binding struct {
-	bindingID  string
-	newExpiry  string
+	BindingID  string
+	NewExpiry  string
 	JSONParams map[string]string
 }
 
 func (binding Binding) Validate() error {
 	return validation.ValidateStruct(&binding,
-		validation.Field(&binding.bindingID, validation.Required),
-		validation.Field(&binding.newExpiry, validation.Match(regexp.MustCompile("^[0-9]{6}$"))),
+		validation.Field(&binding.BindingID, validation.Required),
+		validation.Field(&binding.NewExpiry, validation.Match(regexp.MustCompile("^[0-9]{6}$"))),
 	)
 }
 
@@ -64,7 +64,7 @@ var bind = func(ctx context.Context, client Client, path string, binding Binding
 	}
 
 	body := make(map[string]string)
-	body["bindingId"] = binding.bindingID
+	body["bindingId"] = binding.BindingID
 
 	return client.bind(ctx, path, body, binding.JSONParams)
 }
@@ -85,8 +85,8 @@ func (c Client) ExtendBinding(ctx context.Context, binding Binding) (*schema.Res
 	}
 
 	body := make(map[string]string)
-	body["bindingId"] = binding.bindingID
-	body["newExpiry"] = binding.newExpiry
+	body["bindingId"] = binding.BindingID
+	body["newExpiry"] = binding.NewExpiry
 
 	return c.bind(ctx, path, body, binding.JSONParams)
 }

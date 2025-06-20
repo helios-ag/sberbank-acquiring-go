@@ -42,12 +42,12 @@ func TestClient_BindCard(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test Bind Validate", func(t *testing.T) {
 		binding := Binding{
-			bindingID: "",
+			BindingID: "",
 		}
 
 		_, _, err := BindCard(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("bindingID: cannot be blank"))
+		Expect(err.Error()).To(ContainSubstring("BindingID: cannot be blank"))
 	})
 
 	t.Run("Test Binding response mapping", func(t *testing.T) {
@@ -64,7 +64,7 @@ func TestClient_BindCard(t *testing.T) {
 		})
 
 		binding := Binding{
-			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			BindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
 		}
 
 		response, _, err := BindCard(context.Background(), binding)
@@ -77,32 +77,32 @@ func TestClient_BindCard(t *testing.T) {
 
 	t.Run("Test UnBind Validate", func(t *testing.T) {
 		binding := Binding{
-			bindingID: "",
+			BindingID: "",
 		}
 
 		_, _, err := UnBindCard(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("bindingID: cannot be blank"))
+		Expect(err.Error()).To(ContainSubstring("BindingID: cannot be blank"))
 	})
 
 	t.Run("Test validate ExtendBinding with empty value", func(t *testing.T) {
 		binding := Binding{
-			bindingID: "",
+			BindingID: "",
 		}
 
 		_, _, err := ExtendBinding(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("bindingID: cannot be blank"))
+		Expect(err.Error()).To(ContainSubstring("BindingID: cannot be blank"))
 	})
 
 	t.Run("Test validate ExtendBinding Expiry", func(t *testing.T) {
 		binding := Binding{
-			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
-			newExpiry: "123",
+			BindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			NewExpiry: "123",
 		}
 		_, _, err := ExtendBinding(context.Background(), binding)
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("newExpiry: must be in a valid format."))
+		Expect(err.Error()).To(ContainSubstring("NewExpiry: must be in a valid format."))
 	})
 
 	t.Run("Test ExtendBinding is ok", func(t *testing.T) {
@@ -119,8 +119,8 @@ func TestClient_BindCard(t *testing.T) {
 		})
 
 		binding := Binding{
-			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
-			newExpiry: "123123",
+			BindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			NewExpiry: "123123",
 		}
 		_, _, err := ExtendBinding(context.Background(), binding)
 		// We don't care what underlying error happened
@@ -150,7 +150,7 @@ func TestClient_BindCard(t *testing.T) {
 		})
 
 		binding := Binding{
-			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			BindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
 		}
 
 		response, _, err := BindCard(context.Background(), binding)
@@ -167,11 +167,11 @@ func TestClient_ValidateBind(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test bind validator", func(t *testing.T) {
 		binding := Binding{
-			bindingID: "",
+			BindingID: "",
 		}
 		err := binding.Validate()
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("bindingID: cannot be blank"))
+		Expect(err.Error()).To(ContainSubstring("BindingID: cannot be blank"))
 	})
 }
 
@@ -179,8 +179,8 @@ func TestClient_ValidateExpiry(t *testing.T) {
 	RegisterTestingT(t)
 	t.Run("Test expiry is ok", func(t *testing.T) {
 		binding := Binding{
-			bindingID: "123",
-			newExpiry: "123123",
+			BindingID: "123",
+			NewExpiry: "123123",
 		}
 		err := binding.Validate()
 		Expect(err).ToNot(HaveOccurred())
@@ -196,8 +196,8 @@ func TestClient_Bind(t *testing.T) {
 		prepareClient(testServer.URL)
 
 		binding := Binding{
-			bindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
-			newExpiry: "123123",
+			BindingID: "fd3afc57-c6d0-4e08-aaef-1b7cfeb093dc",
+			NewExpiry: "123123",
 		}
 		testServer.Mux.HandleFunc(endpoints.Register, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
