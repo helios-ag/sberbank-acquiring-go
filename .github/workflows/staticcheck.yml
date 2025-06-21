@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
-        go: ["1.22.x"]
+        go: ["1.24.x"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
           go-version: ${{ matrix.go }}
       - run: "go test ./..."
       - run: "go vet ./..."
-      - uses: dominikh/staticcheck-action@v1.2.0
+      - uses: dominikh/staticcheck-action@v1
         with:
           version: "latest"
           install-go: false
