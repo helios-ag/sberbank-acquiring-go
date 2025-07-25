@@ -25,7 +25,7 @@ type ApplePaymentRequest struct {
 }
 
 // PayWithApplePay request
-// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:payment_applepay
+// sees https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:payment_applepay
 func PayWithApplePay(ctx context.Context, applePaymentRequest ApplePaymentRequest) (*schema.ApplePaymentResponse, *http.Response, error) {
 	return getClient().PayWithApplePay(ctx, applePaymentRequest)
 }
@@ -177,6 +177,79 @@ func (c Client) PayWithSamsungPay(ctx context.Context, samsungPaymentRequest Sam
 	_ = json.NewDecoder(result.Body).Decode(&response)
 
 	return &response, result, err
+}
+
+// MirPayPaymentRequest используется для отправки запроса на /payment/mirpay
+// "OrderNumber" _обязательный_ уникальный идентификатор заказа в системе мерчанта
+// "Description" необязательное описание заказа, отображается на странице оплаты
+// "Language" необязательный язык страницы оплаты ("ru" или "en")
+// "ClientId" необязательный идентификатор клиента в системе мерчанта
+type MirPayPaymentRequest struct {
+	Username             string            `json:"userName"`
+	Password             string            `json:"password"`
+	Merchant             string            `json:"merchant"`
+	ClientId             string            `json:"clientId,omitempty"`
+	OrderNumber          string            `json:"orderNumber"`
+	Description          string            `json:"description,omitempty"`
+	Language             string            `json:"language,omitempty"`
+	AdditionalParameters map[string]string `json:"additionalParameters"`
+	PreAuth              bool              `json:"preAuth,omitempty"`
+	PaymentToken         string            `json:"paymentToken"`
+	IP                   string            `json:"ip,omitempty"`
+	Tii                  string            `json:"tii,omitempty"`
+}
+
+// PayWithMirPay is used to send PayWithMirPay request
+func (c Client) PayWithMirPay(ctx context.Context, mirPaymentRequest MirPayPaymentRequest) (*schema.MirPayPaymentResponse, *http.Response, error) {
+	path := endpoints.MirPay
+
+	if err := validateMirPaymentRequest(mirPaymentRequest); err != nil {
+		return nil, nil, err
+	}
+
+	var response schema.MirPayPaymentResponse
+	req, err := c.API.NewRequest(ctx, "GET", path, mirPaymentRequest)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	result, err := c.API.Do(req, &response)
+	if err != nil {
+		return nil, result, err
+	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
+	return &response, result, err
+}
+
+// PayWithMirPayDirect PayWithMirDirectPay is used to send PayWithMirDirectPay request
+func (c Client) PayWithMirPayDirect(ctx context.Context, mirPayPaymentRequest MirPayPaymentRequest) (*schema.MirPayPaymentResponse, *http.Response, error) {
+	path := endpoints.MirPayDirect
+
+	if err := validateMirPaymentRequest(mirPayPaymentRequest); err != nil {
+		return nil, nil, err
+	}
+
+	var response schema.MirPayPaymentResponse
+	req, err := c.API.NewRequest(ctx, "GET", path, mirPayPaymentRequest)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	result, err := c.API.Do(req, &response)
+	if err != nil {
+		return nil, result, err
+	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
+	return &response, result, err
+}
+
+func validateMirPaymentRequest(request MirPayPaymentRequest) error {
+	if request.OrderNumber == "" || request.Merchant == "" || request.PaymentToken == "" || request.IP == "" {
+		return fmt.Errorf("orderNumber, merchant and PaymentToken are required")
+	}
+	return nil
 }
 
 func validateSamsungPaymentRequest(request SamsungPaymentRequest) error {
