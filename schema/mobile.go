@@ -63,6 +63,24 @@ type SamsungPaymentResponse struct {
 	} `json:"error,omitempty"`
 }
 
+// MirPayPaymentResponse представляет ответ от API при вызове метода /payment/mirpay
+// "ErrorCode" _обязательный_ код ошибки (0 — если успешно)
+// "ErrorMessage" необязательное текстовое описание ошибки
+// "OrderId" _обязательный_ уникальный идентификатор заказа в системе банка
+// "FormUrl" _обязательный_ URL на платёжную форму для оплаты через Mir Pay
+type MirPayPaymentResponse struct {
+	Success bool `json:"success"`	
+	Data         struct {
+		OrderID   string `json:"orderId,omitempty"`
+		BindingId string `json:"BindingId,omitempty"`
+	} `json:"data"`
+	Error struct {
+		Code        int    `json:"code"`
+		Description string `json:"description"`
+		Message     string `json:"message"`
+	} `json:"error,omitempty"`
+}
+
 // GooglePaymentResponse is response from PayWithGooglePay request
 type GooglePaymentResponse struct {
 	Success bool `json:"success"`

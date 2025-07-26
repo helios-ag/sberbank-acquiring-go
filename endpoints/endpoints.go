@@ -15,7 +15,12 @@ const (
 	ExtendBinding          string = "/payment/rest/extendBinding.do"
 	ApplePay               string = "/payment/applepay/payment.do"
 	SamsungPay             string = "/payment/samsung/payment.do"
+	SamsungWebPay          string = "/payment/samsungWeb/payment.do"
 	GooglePay              string = "/payment/google/payment.do"
-	VerifyEnrollment       string = "/payment/rest/verifyEnrollment.do"
-	UpdateSSLCardList      string = "/payment/rest/updateSSLCardList.do"
+	MirPay                 string = "/payment/mir/payment.do"
+	MirPayDirect           string = "/payment/mir/paymentDirect.do"
+	Decline                string = "/payment/rest/decline.do"
+
+	VerifyEnrollment  string = "/payment/rest/verifyEnrollment.do"
+	UpdateSSLCardList string = "/payment/rest/updateSSLCardList.do"
 )
