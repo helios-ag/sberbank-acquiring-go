@@ -214,7 +214,7 @@ func errorFromResponse(resp *http.Response, body []byte) error {
 	if respBody.ErrorCode == 0 && respBody.ErrorMessage == "" {
 		return nil
 	}
-	return fmt.Errorf(respBody.ErrorMessage)
+	return fmt.Errorf("%s", respBody.ErrorMessage)
 }
 
 func (c *ClientConfig) validate() error {

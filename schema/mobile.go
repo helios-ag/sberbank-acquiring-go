@@ -69,10 +69,7 @@ type SamsungPaymentResponse struct {
 // "OrderId" _обязательный_ уникальный идентификатор заказа в системе банка
 // "FormUrl" _обязательный_ URL на платёжную форму для оплаты через Mir Pay
 type MirPayPaymentResponse struct {
-	ErrorCode    int    `json:"errorCode"`              // Код результата операции (0 — успех)
-	ErrorMessage string `json:"errorMessage,omitempty"` // Текстовое описание ошибки (если есть)
-	OrderId      string `json:"orderId"`                // Идентификатор заказа в системе банка
-	FormUrl      string `json:"formUrl"`                // URL платёжной формы Mir Pay
+	Success bool `json:"success"`	
 	Data         struct {
 		OrderID   string `json:"orderId,omitempty"`
 		BindingId string `json:"BindingId,omitempty"`

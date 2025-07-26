@@ -199,6 +199,12 @@ type MirPayPaymentRequest struct {
 	Tii                  string            `json:"tii,omitempty"`
 }
 
+// PayWithMirPay request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:payment_googlepay
+func PayWithMirPay(ctx context.Context, mirPayPaymentRequest MirPayPaymentRequest) (*schema.MirPayPaymentResponse, *http.Response, error) {
+	return getClient().PayWithMirPay(ctx, mirPayPaymentRequest)
+}
+
 // PayWithMirPay is used to send PayWithMirPay request
 func (c Client) PayWithMirPay(ctx context.Context, mirPaymentRequest MirPayPaymentRequest) (*schema.MirPayPaymentResponse, *http.Response, error) {
 	path := endpoints.MirPay
@@ -220,6 +226,12 @@ func (c Client) PayWithMirPay(ctx context.Context, mirPaymentRequest MirPayPayme
 	_ = json.NewDecoder(result.Body).Decode(&response)
 
 	return &response, result, err
+}
+
+// PayWithMirPayDirect request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:payment_googlepay
+func PayWithMirPayDirect(ctx context.Context, mirPayPaymentRequest MirPayPaymentRequest) (*schema.MirPayPaymentResponse, *http.Response, error) {
+	return getClient().PayWithMirPayDirect(ctx, mirPayPaymentRequest)
 }
 
 // PayWithMirPayDirect PayWithMirDirectPay is used to send PayWithMirDirectPay request
@@ -247,7 +259,7 @@ func (c Client) PayWithMirPayDirect(ctx context.Context, mirPayPaymentRequest Mi
 
 func validateMirPaymentRequest(request MirPayPaymentRequest) error {
 	if request.OrderNumber == "" || request.Merchant == "" || request.PaymentToken == "" || request.IP == "" {
-		return fmt.Errorf("orderNumber, merchant and PaymentToken are required")
+		return fmt.Errorf("orderNumber, merchant, IP and PaymentToken are required")
 	}
 	return nil
 }

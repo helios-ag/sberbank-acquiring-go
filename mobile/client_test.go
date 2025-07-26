@@ -328,3 +328,100 @@ func TestClient_PayWithSamsungPay(t *testing.T) {
 		acquiring.NewRequest = oldNewRequest
 	})
 }
+
+func TestClient_PayWithMirPay(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Test mir payment request validation", func(t *testing.T) {
+
+		req := MirPayPaymentRequest{
+			OrderNumber: "123",
+		}
+
+		_, _, err := PayWithMirPay(context.Background(), req)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("orderNumber, merchant, IP and PaymentToken are required"))
+
+		req = MirPayPaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+		}
+
+		_, _, err = PayWithMirPay(context.Background(), req)
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Test mir Payment response mapping", func(t *testing.T) {
+		testServer := server.NewServer()
+		defer testServer.Teardown()
+		prepareClient(testServer.URL)
+
+		resp := schema.MirPayPaymentResponse{
+			Success: true,
+		}
+
+		resp.Data.OrderID = "b926351f-a634-49cf-9484-ccb0a3b8cfad"
+
+		testServer.Mux.HandleFunc(endpoints.MirPay, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(resp)
+		})
+
+		req := MirPayPaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+			IP: "10.10.10.1",
+		}
+
+		response, _, err := PayWithMirPay(context.Background(), req)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
+			"Success": Equal(true),
+			"Data": MatchFields(IgnoreExtras, Fields{
+				"OrderID": Equal("b926351f-a634-49cf-9484-ccb0a3b8cfad"),
+			}),
+		})))
+	})
+
+	t.Run("Test MirPayment Do", func(t *testing.T) {
+		testServer := server.NewServer()
+		defer testServer.Teardown()
+
+		testServer.Mux.HandleFunc(endpoints.MirPay, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		})
+
+		req := MirPayPaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+		}
+
+		_, _, err := PayWithMirPay(context.Background(), req)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Test MirPayment NewRequest", func(t *testing.T) {
+		testServer := server.NewServer()
+		defer testServer.Teardown()
+		oldNewRequest := acquiring.NewRequest
+		acquiring.NewRequest = NewRequestStub
+		testServer.Mux.HandleFunc(endpoints.GooglePay, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		})
+
+		req := MirPayPaymentRequest{
+			OrderNumber:  "test",
+			Merchant:     "test",
+			PaymentToken: "test",
+		}
+
+		_, _, err := PayWithMirPay(context.Background(), req)
+		// We don't care what underlying error happened
+		Expect(err).To(HaveOccurred())
+		acquiring.NewRequest = oldNewRequest
+	})
+}
