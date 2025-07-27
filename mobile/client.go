@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	acquiring "github.com/helios-ag/sberbank-acquiring-go"
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
-	"net/http"
 )
 
 type Client struct {
@@ -159,6 +160,30 @@ func PayWithSamsungPay(ctx context.Context, samsungPaymentRequest SamsungPayment
 // PayWithSamsungPay is used to send PayWithSamsungPay request
 func (c Client) PayWithSamsungPay(ctx context.Context, samsungPaymentRequest SamsungPaymentRequest) (*schema.SamsungPaymentResponse, *http.Response, error) {
 	path := endpoints.SamsungPay
+
+	if err := validateSamsungPaymentRequest(samsungPaymentRequest); err != nil {
+		return nil, nil, err
+	}
+
+	var response schema.SamsungPaymentResponse
+	req, err := c.API.NewRequest(ctx, "GET", path, samsungPaymentRequest)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	result, err := c.API.Do(req, &response)
+	if err != nil {
+		return nil, result, err
+	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
+	return &response, result, err
+}
+
+// PayWithSamsungPayDirect is used to send PayWithSamsungPay request
+// TODO
+func (c Client) PayWithSamsungPayDirect(ctx context.Context, samsungPaymentRequest SamsungPaymentRequest) (*schema.SamsungPaymentResponse, *http.Response, error) {
+	path := endpoints.SamsungWebPay
 
 	if err := validateSamsungPaymentRequest(samsungPaymentRequest); err != nil {
 		return nil, nil, err

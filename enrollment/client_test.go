@@ -3,6 +3,9 @@ package enrollment
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"testing"
+
 	acquiring "github.com/helios-ag/sberbank-acquiring-go"
 	"github.com/helios-ag/sberbank-acquiring-go/currency"
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
@@ -10,8 +13,6 @@ import (
 	server "github.com/helios-ag/sberbank-acquiring-go/testing"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
-	"net/http"
-	"testing"
 )
 
 func prepareClient(URL string) {

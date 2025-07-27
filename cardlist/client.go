@@ -3,10 +3,11 @@ package cardlist
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+
 	acquiring "github.com/helios-ag/sberbank-acquiring-go"
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
-	"net/http"
 )
 
 type Client struct {
