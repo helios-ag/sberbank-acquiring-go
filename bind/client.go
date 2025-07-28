@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"regexp"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	acquiring "github.com/helios-ag/sberbank-acquiring-go"
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
-	"net/http"
-	"regexp"
 )
 
 type Client struct {

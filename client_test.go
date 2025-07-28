@@ -5,16 +5,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/helios-ag/sberbank-acquiring-go/currency"
-	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
-	"github.com/helios-ag/sberbank-acquiring-go/schema"
-	server "github.com/helios-ag/sberbank-acquiring-go/testing"
-	. "github.com/onsi/gomega"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/helios-ag/sberbank-acquiring-go/currency"
+	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
+	"github.com/helios-ag/sberbank-acquiring-go/schema"
+	server "github.com/helios-ag/sberbank-acquiring-go/testing"
+	. "github.com/onsi/gomega"
 )
 
 func TestNewClient(t *testing.T) {
