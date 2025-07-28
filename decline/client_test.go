@@ -15,17 +15,6 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-//
-//var NewRestRequestStub = func(
-//	c *acquiring.Client,
-//	ctx context.Context,
-//	method,
-//	urlPath string,
-//	data map[string]string,
-//	jsonParams map[string]string) (*http.Request, error) {
-//	return nil, fmt.Errorf("error happened")
-//}
-
 func prepareClient(URL string) {
 	cfg := acquiring.ClientConfig{
 		UserName:           "test-api",
