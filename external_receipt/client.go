@@ -15,7 +15,7 @@ type Client struct {
 	API acquiring.API
 }
 
-// ExternalReceiptRequest is used for building ExternalReceipt request
+// ExternalReceiptRequest is used for building GetExternalReceipt request
 //
 // Language - язык в кодировке ISO 639-1. Если не указан — будет использован язык по умолчанию.
 // UserName - логин служебной учётной записи продавца.
@@ -49,13 +49,13 @@ type Receipt struct {
 	ReceiptDateTime         *string  `json:"receipt_date_time,omitempty"`         // Дата и время чека (формат: yyyy:MM:dd HH:mm:ss)
 }
 
-// ExternalReceipt request
+// GetExternalReceipt request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:externalreceipt
-func ExternalReceipt(ctx context.Context, externalReceipt ExternalReceiptRequest) (*schema.ExternalReceipt, *http.Response, error) {
+func GetExternalReceipt(ctx context.Context, externalReceipt ExternalReceiptRequest) (*schema.ExternalReceipt, *http.Response, error) {
 	return getClient().GetExternalReceipt(ctx, externalReceipt)
 }
 
-// GetExternalReceipt ExternalReceipt request
+// GetExternalReceipt GetExternalReceipt request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:externalreceipt
 func (c Client) GetExternalReceipt(ctx context.Context, externalReceipt ExternalReceiptRequest) (*schema.ExternalReceipt, *http.Response, error) {
 	path := endpoints.ExternalReceipt
@@ -67,17 +67,19 @@ func (c Client) GetExternalReceipt(ctx context.Context, externalReceipt External
 	var receipt, _ = json.Marshal(externalReceipt.Receipt)
 	var jsonParams, _ = json.Marshal(externalReceipt.JSONParams)
 	body := map[string]string{
-		"language":   *externalReceipt.Language,
+
 		"userName":   externalReceipt.UserName,
 		"password":   externalReceipt.Password,
 		"mdOrder":    externalReceipt.MdOrder,
 		"receipt":    string(receipt[:]),
 		"jsonParams": string(jsonParams[:]),
 	}
-
+	if externalReceipt.Language != nil {
+		body["language"] = *externalReceipt.Language
+	}
 	var response schema.ExternalReceipt
 
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, *externalReceipt.JSONParams)
+	req, err := c.API.NewRequest(ctx, "GET", path, body)
 
 	if err != nil {
 		return nil, nil, err
@@ -92,7 +94,7 @@ func (c Client) GetExternalReceipt(ctx context.Context, externalReceipt External
 }
 
 func validateExternalReceiptRequest(externalReceiptRequest ExternalReceiptRequest) error {
-	if externalReceiptRequest.UserName == "" && externalReceiptRequest.Password == "" && externalReceiptRequest.MdOrder == "" && externalReceiptRequest.Receipt == nil {
+	if externalReceiptRequest.UserName == "" || externalReceiptRequest.Password == "" || externalReceiptRequest.MdOrder == "" || externalReceiptRequest.Receipt == nil {
 		return fmt.Errorf("userName and Password and mdOrder and Receipt are required")
 	}
 
