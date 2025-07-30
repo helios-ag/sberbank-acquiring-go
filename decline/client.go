@@ -64,7 +64,7 @@ var decline = func(ctx context.Context, client Client, path string, decline Decl
 
 func (c Client) decline(ctx context.Context, path string, body map[string]string) (*schema.DeclineResponse, *http.Response, error) {
 	var response schema.DeclineResponse
-	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, nil)
+	req, err := c.API.NewRestRequest(ctx, http.MethodPost, path, body, nil)
 
 	if err != nil {
 		return nil, nil, err
