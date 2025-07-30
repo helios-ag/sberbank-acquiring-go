@@ -26,12 +26,12 @@ type Client struct {
 // BasketID - идентификатор корзины покупки или возврата.
 // JsonParams - Дополнительные параметры запроса.
 type ExternalReceiptRequest struct {
-	Language   *string            `json:"language,omitempty"`   // Язык в кодировке ISO 639-1
-	UserName   string             `json:"userName"`             // Логин служебной учётной записи продавца
-	Password   string             `json:"password"`             // Пароль служебной учётной записи продавца
-	MdOrder    string             `json:"mdOrder"`              // Уникальный номер заказа в платёжном шлюзе
-	Receipt    *Receipt           `json:"receipt"`              // Блок с параметрами чека (структура Receipt уже определена)
-	JSONParams *map[string]string `json:"jsonParams,omitempty"` // Дополнительные параметры запроса
+	Language   *string     `json:"language,omitempty"`   // Язык в кодировке ISO 639-1
+	UserName   string      `json:"userName"`             // Логин служебной учётной записи продавца
+	Password   string      `json:"password"`             // Пароль служебной учётной записи продавца
+	MdOrder    string      `json:"mdOrder"`              // Уникальный номер заказа в платёжном шлюзе
+	Receipt    *Receipt    `json:"receipt"`              // Блок с параметрами чека (структура Receipt уже определена)
+	JSONParams *JSONParams `json:"jsonParams,omitempty"` // Дополнительные параметры запроса
 }
 
 type JSONParams struct {
@@ -67,15 +67,17 @@ func (c Client) GetExternalReceipt(ctx context.Context, externalReceipt External
 	var receipt, _ = json.Marshal(externalReceipt.Receipt)
 	var jsonParams, _ = json.Marshal(externalReceipt.JSONParams)
 	body := map[string]string{
-
-		"userName":   externalReceipt.UserName,
-		"password":   externalReceipt.Password,
-		"mdOrder":    externalReceipt.MdOrder,
-		"receipt":    string(receipt[:]),
-		"jsonParams": string(jsonParams[:]),
+		"userName": externalReceipt.UserName,
+		"password": externalReceipt.Password,
+		"mdOrder":  externalReceipt.MdOrder,
+		"receipt":  string(receipt[:]),
 	}
 	if externalReceipt.Language != nil {
 		body["language"] = *externalReceipt.Language
+	}
+
+	if externalReceipt.JSONParams != nil {
+		body["jsonParams"] = string(jsonParams[:])
 	}
 	var response schema.ExternalReceipt
 
