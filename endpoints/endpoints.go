@@ -20,6 +20,7 @@ const (
 	MirPay                 string = "/payment/mir/payment.do"
 	MirPayDirect           string = "/payment/mir/paymentDirect.do"
 	Decline                string = "/payment/rest/decline.do"
+	ExternalReceipt        string = "/fes-nspk-proxy/externalReceipt"
 
 	VerifyEnrollment  string = "/payment/rest/verifyEnrollment.do"
 	UpdateSSLCardList string = "/payment/rest/updateSSLCardList.do"

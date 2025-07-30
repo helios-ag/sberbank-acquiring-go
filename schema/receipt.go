@@ -28,3 +28,8 @@ type ReceiptStatus struct {
 		} `json:"OFD,omitempty"`
 	} `json:"receipt"`
 }
+
+type ExternalReceipt struct {
+	ErrorCode    int    `json:"errorCode,string,omitempty"`
+	ErrorMessage string `json:"errorMessage,omitempty"`
+}
