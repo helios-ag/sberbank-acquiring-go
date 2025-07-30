@@ -79,7 +79,7 @@ func (c Client) GetExternalReceipt(ctx context.Context, externalReceipt External
 	}
 	var response schema.ExternalReceipt
 
-	req, err := c.API.NewRequest(ctx, "GET", path, body)
+	req, err := c.API.NewRequest(ctx, http.MethodPost, path, body)
 
 	if err != nil {
 		return nil, nil, err
@@ -88,7 +88,6 @@ func (c Client) GetExternalReceipt(ctx context.Context, externalReceipt External
 	if err != nil {
 		return nil, result, err
 	}
-	_ = json.NewDecoder(result.Body).Decode(&response)
 
 	return &response, result, err
 }
