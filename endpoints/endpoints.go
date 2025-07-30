@@ -19,7 +19,7 @@ const (
 	GetBindings            string = "/payment/rest/getBindings.do"
 	GetBindingsByCardOrId  string = "/payment/rest/getBindingsByCardOrId.do"
 	ExtendBinding          string = "/payment/rest/extendBinding.do"
-	CreateBindingNoPayment string = "payment/rest/createBindingNoPayment.do"
+	CreateBindingNoPayment string = "/payment/rest/createBindingNoPayment.do"
 
 	ApplePay        string = "/payment/applepay/payment.do"
 	SamsungPay      string = "/payment/samsung/payment.do"
