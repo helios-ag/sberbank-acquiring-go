@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"regexp"
+	"strconv"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	acquiring "github.com/helios-ag/sberbank-acquiring-go"
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
-	"net/http"
-	"regexp"
-	"strconv"
 )
 
 type Client struct {
@@ -305,7 +306,6 @@ func (c Client) RegisterOrderPreAuth(ctx context.Context, order Order) (*schema.
 	return orderResponse, result, err
 }
 
-//
 func (c Client) register(ctx context.Context, path string, order Order) (*schema.OrderResponse, *http.Response, error) {
 	body := make(map[string]string)
 	var orderBundle, _ = json.Marshal(order.OrderBundle)
