@@ -133,6 +133,8 @@ func TestClient_InstantRefund(t *testing.T) {
 		defer newServer.Teardown()
 		prepareClient(newServer.URL)
 		oldNewRequest := acquiring.NewRestRequest
+		defer func() { acquiring.NewRestRequest = oldNewRequest }()
+
 		acquiring.NewRestRequest = NewRestRequestStub
 
 		orderNumber := "9231a838-ac68-4a3e"
@@ -143,7 +145,6 @@ func TestClient_InstantRefund(t *testing.T) {
 		}
 		_, _, err := InstantRefund(context.Background(), request)
 		Expect(err).To(HaveOccurred())
-		acquiring.NewRestRequest = oldNewRequest
 	})
 
 	t.Run("Test Refund Do", func(t *testing.T) {
