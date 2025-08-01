@@ -10,3 +10,15 @@ type BindingsResponse struct {
 		ExpiryDate string `json:"expiryDate,omitempty"`
 	} `json:"bindings,omitempty"`
 }
+
+// BindingsByCardOrIdResponse is mapped Binding response from GetBindingsByCardOrId request
+type BindingsByCardOrIdResponse struct {
+	ErrorCode    int    `json:"errorCode,string"`
+	ErrorMessage string `json:"errorMessage,omitempty"`
+	Bindings     []struct {
+		BindingId  string `json:"bindingId,omitempty"`
+		MaskedPan  string `json:"maskedPan,omitempty"`
+		ExpiryDate string `json:"expiryDate,omitempty"`
+		ClientId   string `json:"clientId,omitempty"`
+	} `json:"bindings,omitempty"`
+}
