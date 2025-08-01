@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"testing"
+
 	acquiring "github.com/helios-ag/sberbank-acquiring-go"
 	"github.com/helios-ag/sberbank-acquiring-go/currency"
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
@@ -11,8 +14,6 @@ import (
 	server "github.com/helios-ag/sberbank-acquiring-go/testing"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
-	"net/http"
-	"testing"
 )
 
 var NewRestRequestStub = func(
@@ -256,6 +257,71 @@ func TestClient_GetBindings(t *testing.T) {
 		})
 
 		_, _, err := GetBindings(context.Background(), "123123", nil)
+		// We dont care what underlying error happened
+		Expect(err).ToNot(HaveOccurred())
+	})
+}
+
+func TestClient_GetBindingsByCardOrId(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Trigger GetBindingsByCardOrId error on Do", func(t *testing.T) {
+		testServer := server.NewServer()
+		defer testServer.Teardown()
+		prepareClient(testServer.URL)
+
+		testServer.Mux.HandleFunc(endpoints.GetBindingsByCardOrId, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		})
+
+		binding := GetBindingsRequest{
+			UserName: "username",
+			Password: "password",
+		}
+
+		_, _, err := GetBindingsByCardOrId(context.Background(), binding)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Test GetBindingsByCardOrId with fail on NewRestRequest", func(t *testing.T) {
+		testServer := server.NewServer()
+		defer testServer.Teardown()
+		prepareClient(testServer.URL)
+
+		oldNewRequest := acquiring.NewRestRequest
+		acquiring.NewRestRequest = NewRestRequestStub
+
+		binding := GetBindingsRequest{
+			UserName: "username",
+			Password: "password",
+		}
+
+		_, _, err := GetBindingsByCardOrId(context.Background(), binding)
+		// We dont care what underlying error happened, we just don't run server to handle request
+		Expect(err).To(HaveOccurred())
+		acquiring.NewRestRequest = oldNewRequest
+	})
+
+	t.Run("GetBindingByCardOrId is working as expected", func(t *testing.T) {
+		testServer := server.NewServer()
+		defer testServer.Teardown()
+		prepareClient(testServer.URL)
+
+		testServer.Mux.HandleFunc(endpoints.GetBindingsByCardOrId, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(schema.BindingsByCardOrIdResponse{
+				ErrorCode:    0,
+				ErrorMessage: "Binding is active",
+			})
+		})
+		pan := "123123123123"
+		binding := GetBindingsRequest{
+			UserName: "username",
+			Password: "password",
+			PAN:      &pan,
+		}
+		_, _, err := GetBindingsByCardOrId(context.Background(), binding)
 		// We dont care what underlying error happened
 		Expect(err).ToNot(HaveOccurred())
 	})

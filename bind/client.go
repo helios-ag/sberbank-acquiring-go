@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	acquiring "github.com/helios-ag/sberbank-acquiring-go"
@@ -128,6 +129,74 @@ func (c Client) GetBindings(ctx context.Context, clientId string, jsonParams map
 
 	var response schema.BindingsResponse
 	req, err := c.API.NewRestRequest(ctx, "GET", path, body, jsonParams)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	result, err := c.API.Do(req, &response)
+	if err != nil {
+		return nil, result, err
+	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
+	return &response, result, err
+}
+
+type GetBindingsRequest struct {
+	PAN         *string
+	UserName    string
+	Password    string
+	BindingID   *string
+	ShowExpired *bool
+}
+
+func validateGetBindingRequest(request GetBindingsRequest) error {
+	if request.UserName == "" || request.Password == "" {
+		return fmt.Errorf("userName and Password are required")
+	}
+	if request.PAN == nil && request.BindingID == nil {
+		return fmt.Errorf("either PAN or BindingID must be provided")
+	}
+
+	if len(*request.PAN) < 12 || len(*request.PAN) > 19 {
+		return fmt.Errorf("PAN must be between 12 and 19 characters")
+	}
+
+	return nil
+}
+
+// GetBindingsByCardOrId request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getbindingsbycardorid
+func GetBindingsByCardOrId(ctx context.Context, request GetBindingsRequest) (*schema.BindingsByCardOrIdResponse, *http.Response, error) {
+	return getClient().GetBindingsByCardOrId(ctx, request)
+}
+
+// GetBindingsByCardOrId request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getbindingsbycardorid
+func (c Client) GetBindingsByCardOrId(ctx context.Context, request GetBindingsRequest) (*schema.BindingsByCardOrIdResponse, *http.Response, error) {
+	path := endpoints.GetBindingsByCardOrId
+
+	if err := validateGetBindingRequest(request); err != nil {
+		return nil, nil, err
+	}
+
+	body := map[string]string{
+		"userName": request.UserName,
+		"password": request.Password,
+	}
+
+	if request.PAN != nil {
+		body["pan"] = *request.PAN
+	}
+	if request.BindingID != nil {
+		body["bindingId"] = *request.BindingID
+	}
+	if request.ShowExpired != nil {
+		body["showExpired"] = strconv.FormatBool(*request.ShowExpired)
+	}
+
+	var response schema.BindingsByCardOrIdResponse
+	req, err := c.API.NewRestRequest(ctx, http.MethodPost, path, body, nil)
 
 	if err != nil {
 		return nil, nil, err
