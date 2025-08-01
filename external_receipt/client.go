@@ -1,4 +1,4 @@
-package receipt
+package external_receipt
 
 import (
 	"context"
