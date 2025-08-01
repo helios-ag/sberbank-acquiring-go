@@ -104,7 +104,7 @@ func (c Client) InstantRefund(ctx context.Context, instantRefundRequest InstantR
 	}
 
 	if instantRefundRequest.JSONParams != nil {
-		body["jsonParams"] = string(jsonParams[:])
+		body["jsonParams"] = string(jsonParams)
 	}
 
 	var orderResponse schema.InstantRefundResponse

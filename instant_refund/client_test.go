@@ -151,7 +151,7 @@ func TestClient_InstantRefund(t *testing.T) {
 		defer newServer.Teardown()
 		prepareClient(newServer.URL)
 
-		newServer.Mux.HandleFunc(endpoints.Refund, func(w http.ResponseWriter, r *http.Request) {
+		newServer.Mux.HandleFunc(endpoints.InstantRefund, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		})
 		orderNumber := "9231a838-ac68-4a3e"
