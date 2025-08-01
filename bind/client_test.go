@@ -315,10 +315,11 @@ func TestClient_GetBindingsByCardOrId(t *testing.T) {
 				ErrorMessage: "Binding is active",
 			})
 		})
-
+		pan := "123123123123"
 		binding := GetBindingsRequest{
 			UserName: "username",
 			Password: "password",
+			PAN:      &pan,
 		}
 		_, _, err := GetBindingsByCardOrId(context.Background(), binding)
 		// We dont care what underlying error happened
