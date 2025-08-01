@@ -150,13 +150,19 @@ type GetBindingsRequest struct {
 	ShowExpired *bool
 }
 
-func (request GetBindingsRequest) Validate() error {
-	return validation.ValidateStruct(&request,
-		validation.Field(&request.BindingID, validation.Required),
-		validation.Field(&request.UserName, validation.Required),
-		validation.Field(&request.Password, validation.Required),
-		validation.Field(&request.PAN, validation.Length(12, 19)),
-	)
+func validateGetBindingRequest(request GetBindingsRequest) error {
+	if request.UserName == "" || request.Password == "" {
+		return fmt.Errorf("userName and Password are required")
+	}
+	if request.PAN == nil && request.BindingID == nil {
+		return fmt.Errorf("either PAN or BindingID must be provided")
+	}
+
+	if len(*request.PAN) < 12 || len(*request.PAN) > 19 {
+		return fmt.Errorf("PAN must be between 12 and 19 characters")
+	}
+
+	return nil
 }
 
 // GetBindingsByCardOrId request
@@ -169,6 +175,10 @@ func GetBindingsByCardOrId(ctx context.Context, request GetBindingsRequest) (*sc
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getbindingsbycardorid
 func (c Client) GetBindingsByCardOrId(ctx context.Context, request GetBindingsRequest) (*schema.BindingsByCardOrIdResponse, *http.Response, error) {
 	path := endpoints.GetBindingsByCardOrId
+
+	if err := validateGetBindingRequest(request); err != nil {
+		return nil, nil, err
+	}
 
 	body := map[string]string{
 		"userName": request.UserName,
