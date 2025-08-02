@@ -22,3 +22,13 @@ type BindingsByCardOrIdResponse struct {
 		ClientId   string `json:"clientId,omitempty"`
 	} `json:"bindings,omitempty"`
 }
+type BindingsNoPaymentResponse struct {
+	ErrorCode      int    `json:"errorCode,string"`
+	Error          string `json:"error,omitempty"`
+	ErrorMessage   string `json:"errorMessage,omitempty"`
+	BindingId      string `json:"bindingId,omitempty"`
+	CardholderName string `json:"cardholderName,omitempty"`
+	ClientId       string `json:"clientId,omitempty"`
+	ExpiryDate     string `json:"expiryDate,omitempty"`
+	MaskedPan      string `json:"maskedPan,omitempty"`
+}
