@@ -28,7 +28,7 @@ func (c Client) UpdateSSLCardList(ctx context.Context, mdorder string, jsonParam
 	body["mdorder"] = mdorder
 
 	var response schema.Response
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, jsonParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, jsonParams)
 
 	if err != nil {
 		return nil, nil, err

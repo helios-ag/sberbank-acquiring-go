@@ -246,7 +246,7 @@ func TestNewRequest(t *testing.T) {
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("invalid method"))
 
-		_, err = GetAPI().NewRequest(ctx, "GET", "htt\\wrongUrl", nil)
+		_, err = GetAPI().NewRequest(ctx, http.MethodGet, "htt\\wrongUrl", nil)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("invalid character"))
 	})

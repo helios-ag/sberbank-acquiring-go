@@ -42,7 +42,7 @@ func (c Client) PayWithApplePay(ctx context.Context, applePaymentRequest ApplePa
 
 	var response schema.ApplePaymentResponse
 
-	req, err := c.API.NewRequest(ctx, "GET", path, applePaymentRequest)
+	req, err := c.API.NewRequest(ctx, http.MethodGet, path, applePaymentRequest)
 
 	if err != nil {
 		return nil, nil, err
@@ -109,7 +109,7 @@ func (c Client) PayWithGooglePay(ctx context.Context, googlePaymentRequest Googl
 
 	var response schema.GooglePaymentResponse
 
-	req, err := c.API.NewRequest(ctx, "GET", path, googlePaymentRequest)
+	req, err := c.API.NewRequest(ctx, http.MethodGet, path, googlePaymentRequest)
 
 	if err != nil {
 		return nil, nil, err
@@ -166,7 +166,7 @@ func (c Client) PayWithSamsungPay(ctx context.Context, samsungPaymentRequest Sam
 	}
 
 	var response schema.SamsungPaymentResponse
-	req, err := c.API.NewRequest(ctx, "GET", path, samsungPaymentRequest)
+	req, err := c.API.NewRequest(ctx, http.MethodGet, path, samsungPaymentRequest)
 
 	if err != nil {
 		return nil, nil, err
@@ -190,7 +190,7 @@ func (c Client) PayWithSamsungPayDirect(ctx context.Context, samsungPaymentReque
 	}
 
 	var response schema.SamsungPaymentResponse
-	req, err := c.API.NewRequest(ctx, "GET", path, samsungPaymentRequest)
+	req, err := c.API.NewRequest(ctx, http.MethodGet, path, samsungPaymentRequest)
 
 	if err != nil {
 		return nil, nil, err
@@ -239,7 +239,7 @@ func (c Client) PayWithMirPay(ctx context.Context, mirPaymentRequest MirPayPayme
 	}
 
 	var response schema.MirPayPaymentResponse
-	req, err := c.API.NewRequest(ctx, "GET", path, mirPaymentRequest)
+	req, err := c.API.NewRequest(ctx, http.MethodGet, path, mirPaymentRequest)
 
 	if err != nil {
 		return nil, nil, err
@@ -268,7 +268,7 @@ func (c Client) PayWithMirPayDirect(ctx context.Context, mirPayPaymentRequest Mi
 	}
 
 	var response schema.MirPayPaymentResponse
-	req, err := c.API.NewRequest(ctx, "GET", path, mirPayPaymentRequest)
+	req, err := c.API.NewRequest(ctx, http.MethodGet, path, mirPayPaymentRequest)
 
 	if err != nil {
 		return nil, nil, err

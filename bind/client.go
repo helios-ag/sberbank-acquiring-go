@@ -128,7 +128,7 @@ func (c Client) GetBindings(ctx context.Context, clientId string, jsonParams map
 	body["clientId"] = clientId
 
 	var response schema.BindingsResponse
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, jsonParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, jsonParams)
 
 	if err != nil {
 		return nil, nil, err

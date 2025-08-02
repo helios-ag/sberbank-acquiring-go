@@ -45,7 +45,7 @@ func (c Client) GetReceiptStatus(ctx context.Context, receiptStatusRequest Statu
 
 	var response schema.ReceiptStatus
 
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, receiptStatusRequest.JsonParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, receiptStatusRequest.JsonParams)
 
 	if err != nil {
 		return nil, nil, err
