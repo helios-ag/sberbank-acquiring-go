@@ -357,7 +357,7 @@ func (c Client) Deposit(ctx context.Context, order Order) (*schema.OrderResponse
 	body["amount"] = strconv.Itoa(order.Amount)
 
 	var orderResponse schema.OrderResponse
-	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, order.JSONParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodPost, path, body, order.JSONParams)
 
 	if err != nil {
 		return nil, nil, err

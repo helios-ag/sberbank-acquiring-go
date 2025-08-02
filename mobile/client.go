@@ -42,7 +42,7 @@ func (c Client) PayWithApplePay(ctx context.Context, applePaymentRequest ApplePa
 
 	var response schema.ApplePaymentResponse
 
-	req, err := c.API.NewRequest(ctx, http.MethodGet, path, applePaymentRequest)
+	req, err := c.API.NewRequest(ctx, http.MethodPost, path, applePaymentRequest)
 
 	if err != nil {
 		return nil, nil, err
