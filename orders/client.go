@@ -357,7 +357,7 @@ func (c Client) Deposit(ctx context.Context, order Order) (*schema.OrderResponse
 	body["amount"] = strconv.Itoa(order.Amount)
 
 	var orderResponse schema.OrderResponse
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodPost, path, body, order.JSONParams)
 
 	if err != nil {
 		return nil, nil, err
@@ -391,7 +391,7 @@ func (c Client) ReverseOrder(ctx context.Context, order Order) (*schema.OrderRes
 	body["orderId"] = order.OrderNumber
 
 	var orderResponse schema.OrderResponse
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, order.JSONParams)
 
 	if err != nil {
 		return nil, nil, err
@@ -425,7 +425,7 @@ func (c Client) RefundOrder(ctx context.Context, order Order) (*schema.OrderResp
 	body["refundAmount"] = strconv.Itoa(order.Amount)
 
 	var orderResponse schema.OrderResponse
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, order.JSONParams)
 
 	if err != nil {
 		return nil, nil, err
@@ -476,7 +476,7 @@ func (c Client) GetOrderStatus(ctx context.Context, order Order) (*schema.OrderS
 	body["orderId"] = order.OrderNumber
 
 	var orderResponse schema.OrderStatusResponse
-	req, err := c.API.NewRestRequest(ctx, "GET", path, body, order.JSONParams)
+	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, order.JSONParams)
 
 	if err != nil {
 		return nil, nil, err
