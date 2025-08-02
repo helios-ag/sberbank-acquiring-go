@@ -326,3 +326,70 @@ func TestClient_GetBindingsByCardOrId(t *testing.T) {
 		Expect(err).ToNot(HaveOccurred())
 	})
 }
+
+func TestClient_CreateBindingNoPayment(t *testing.T) {
+	RegisterTestingT(t)
+	t.Run("Trigger CreateBindingNoPayment error on Do", func(t *testing.T) {
+		testServer := server.NewServer()
+		defer testServer.Teardown()
+		prepareClient(testServer.URL)
+
+		testServer.Mux.HandleFunc(endpoints.CreateBindingNoPayment, func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		})
+
+		binding := CreateBindingNoPaymentRequest{
+			UserName: "username",
+			Password: "password",
+		}
+
+		_, _, err := CreateBindingNoPayment(context.Background(), binding)
+		// We dont care what underlying error happened
+		Expect(err).To(HaveOccurred())
+	})
+
+	t.Run("Test CreateBindingNoPayment with fail on NewRestRequest", func(t *testing.T) {
+		testServer := server.NewServer()
+		defer testServer.Teardown()
+		prepareClient(testServer.URL)
+
+		oldNewRequest := acquiring.NewRestRequest
+		acquiring.NewRestRequest = NewRestRequestStub
+
+		binding := CreateBindingNoPaymentRequest{
+			UserName: "username",
+			Password: "password",
+		}
+
+		_, _, err := CreateBindingNoPayment(context.Background(), binding)
+		// We dont care what underlying error happened, we just don't run server to handle request
+		Expect(err).To(HaveOccurred())
+		acquiring.NewRestRequest = oldNewRequest
+	})
+
+	t.Run("CreateBindingNoPayment is working as expected", func(t *testing.T) {
+		testServer := server.NewServer()
+		defer testServer.Teardown()
+		prepareClient(testServer.URL)
+
+		testServer.Mux.HandleFunc(endpoints.CreateBindingNoPayment, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(schema.BindingsNoPaymentResponse{
+				ErrorCode:    0,
+				ErrorMessage: "Binding is active",
+			})
+		})
+		binding := CreateBindingNoPaymentRequest{
+			UserName:       "username",
+			Password:       "password",
+			PAN:            "123123123123",
+			ClientId:       "123123123123",
+			ExpiryDate:     "2021-01-01",
+			CardHolderName: "username",
+		}
+		_, _, err := CreateBindingNoPayment(context.Background(), binding)
+		// We dont care what underlying error happened
+		Expect(err).ToNot(HaveOccurred())
+	})
+}
