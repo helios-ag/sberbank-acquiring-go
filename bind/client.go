@@ -210,6 +210,73 @@ func (c Client) GetBindingsByCardOrId(ctx context.Context, request GetBindingsRe
 	return &response, result, err
 }
 
+type CreateBindingNoPaymentRequest struct {
+	UserName             string
+	Password             string
+	ClientId             string
+	CardHolderName       string
+	PAN                  string
+	MerchantLogin        *string
+	ExpiryDate           string
+	AdditionalParameters map[string]string
+}
+
+func validateCreateBindingNoPaymentRequest(request CreateBindingNoPaymentRequest) error {
+	if request.UserName == "" || request.Password == "" || request.ClientId == "" || request.CardHolderName == "" || request.PAN == "" || request.ExpiryDate == "" {
+		return fmt.Errorf("userName, Password, ClientId, CardHolderName, PAN, ExpiryDate are required")
+	}
+
+	return nil
+}
+
+// CreateBindingNoPayment request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getbindingsbycardorid
+func CreateBindingNoPayment(ctx context.Context, request CreateBindingNoPaymentRequest) (*schema.BindingsNoPaymentResponse, *http.Response, error) {
+	return getClient().CreateBindingNoPayment(ctx, request)
+}
+
+// CreateBindingNoPayment request
+// see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:getbindingsbycardorid
+func (c Client) CreateBindingNoPayment(ctx context.Context, request CreateBindingNoPaymentRequest) (*schema.BindingsNoPaymentResponse, *http.Response, error) {
+	path := endpoints.CreateBindingNoPayment
+
+	if err := validateCreateBindingNoPaymentRequest(request); err != nil {
+		return nil, nil, err
+	}
+
+	body := map[string]string{
+		"userName":       request.UserName,
+		"password":       request.Password,
+		"clientId":       request.ClientId,
+		"cardHolderName": request.CardHolderName,
+		"pan":            request.PAN,
+		"expiryDate":     request.ExpiryDate,
+	}
+
+	if request.AdditionalParameters != nil {
+		var params, _ = json.Marshal(request.AdditionalParameters)
+
+		body["additionalParameters"] = string(params)
+	}
+	if request.MerchantLogin != nil {
+		body["merchantLogin"] = *request.MerchantLogin
+	}
+
+	var response schema.BindingsNoPaymentResponse
+	req, err := c.API.NewRestRequest(ctx, http.MethodPost, path, body, nil)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	result, err := c.API.Do(req, &response)
+	if err != nil {
+		return nil, result, err
+	}
+	_ = json.NewDecoder(result.Body).Decode(&response)
+
+	return &response, result, err
+}
+
 func getClient() Client {
 	return Client{acquiring.GetAPI()}
 }
