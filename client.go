@@ -102,7 +102,7 @@ var NewRestRequest = func(c *Client, ctx context.Context, method, urlPath string
 	body.Add("userName", c.Config.UserName)
 	body.Add("password", c.Config.Password)
 	body.Add("currency", strconv.Itoa(c.Config.Currency))
-	body.Add("jsonParams", string(jsonParamsEncoded[:]))
+	body.Add("jsonParams", string(jsonParamsEncoded))
 	body.Add("sessionTimeoutSecs", strconv.Itoa(c.Config.SessionTimeoutSecs))
 
 	for key, value := range data {
