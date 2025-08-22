@@ -6,13 +6,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/helios-ag/sberbank-acquiring-go/schema"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/helios-ag/sberbank-acquiring-go/schema"
 )
 
 // URLS for API endpoints
@@ -170,7 +171,7 @@ var reader = func(r io.Reader) ([]byte, error) {
 }
 
 // Do perform an HTTP request against the API.
-func (c Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
+func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.httpClient.Do(r)
 	if err != nil {
 		return nil, err

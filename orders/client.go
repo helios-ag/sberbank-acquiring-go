@@ -318,7 +318,7 @@ func (c Client) register(ctx context.Context, path string, order Order) (*schema
 	body["merchantLogin"] = order.MerchantLogin
 	body["expirationDate"] = order.ExpirationDate
 	body["bindingId"] = order.BindingID
-	body["orderBundle"] = string(orderBundle[:])
+	body["orderBundle"] = string(orderBundle)
 	body["features"] = order.Features
 
 	req, err := c.API.NewRestRequest(ctx, http.MethodGet, path, body, order.JSONParams)

@@ -70,14 +70,14 @@ func (c Client) GetExternalReceipt(ctx context.Context, externalReceipt External
 		"userName": externalReceipt.UserName,
 		"password": externalReceipt.Password,
 		"mdOrder":  externalReceipt.MdOrder,
-		"receipt":  string(receipt[:]),
+		"receipt":  string(receipt),
 	}
 	if externalReceipt.Language != nil {
 		body["language"] = *externalReceipt.Language
 	}
 
 	if externalReceipt.JSONParams != nil {
-		body["jsonParams"] = string(jsonParams[:])
+		body["jsonParams"] = string(jsonParams)
 	}
 	var response schema.ExternalReceipt
 
