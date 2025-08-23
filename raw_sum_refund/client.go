@@ -47,13 +47,13 @@ func (request ProcessRawSumRefundRequest) Validate() error {
 
 // ProcessRawSumRefund ProcessRawSumRefundRequest request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:processrawsumrefund
-func ProcessRawSumRefund(ctx context.Context, processRawSumRefundRequest ProcessRawSumRefundRequest) (*schema.ProcessRawSumRefundResponse, *http.Response, error) {
+func ProcessRawSumRefund(ctx context.Context, processRawSumRefundRequest ProcessRawSumRefundRequest) (*schema.ProcessRawRefundResponse, *http.Response, error) {
 	return getClient().ProcessRawSumRefund(ctx, processRawSumRefundRequest)
 }
 
 // ProcessRawSumRefund ProcessRawSumRefundRequest request
 // see https://securepayments.sberbank.ru/wiki/doku.php/integration:api:rest:requests:processrawsumrefund
-func (c Client) ProcessRawSumRefund(ctx context.Context, processRawSumRefundRequest ProcessRawSumRefundRequest) (*schema.ProcessRawSumRefundResponse, *http.Response, error) {
+func (c Client) ProcessRawSumRefund(ctx context.Context, processRawSumRefundRequest ProcessRawSumRefundRequest) (*schema.ProcessRawRefundResponse, *http.Response, error) {
 	path := endpoints.ProcessRawSumRefund
 
 	if err := processRawSumRefundRequest.Validate(); err != nil {
@@ -81,7 +81,7 @@ func (c Client) ProcessRawSumRefund(ctx context.Context, processRawSumRefundRequ
 		body["additionalOfdParams"] = string(additionalOfdParams)
 	}
 
-	var processRawSumRefundResponse schema.ProcessRawSumRefundResponse
+	var processRawSumRefundResponse schema.ProcessRawRefundResponse
 	req, err := c.API.NewRestRequest(ctx, http.MethodPost, path, body, nil)
 
 	if err != nil {

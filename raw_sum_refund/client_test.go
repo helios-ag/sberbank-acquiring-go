@@ -90,7 +90,7 @@ func TestClient_RawSumRefund(t *testing.T) {
 		newServer.Mux.HandleFunc(endpoints.ProcessRawSumRefund, func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(schema.ProcessRawSumRefundResponse{
+			json.NewEncoder(w).Encode(schema.ProcessRawRefundResponse{
 				ErrorCode:    0,
 				ErrorMessage: "Успешно",
 			})
