@@ -12,6 +12,7 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	acquiring "github.com/helios-ag/sberbank-acquiring-go"
 	"github.com/helios-ag/sberbank-acquiring-go/endpoints"
+	"github.com/helios-ag/sberbank-acquiring-go/ofd"
 	"github.com/helios-ag/sberbank-acquiring-go/schema"
 )
 
@@ -31,7 +32,7 @@ type Client struct {
 // "ExpirationDate" check API Docs
 // "BindingID" used in binding API
 // "OrderBundle" OrderBundle data (cart to be consistent with 84 law and OFD 1.05)
-// "AdditionalOfdParams" AdditionalOfdParams extra data (for OFD 1.05 and up)
+// "AdditionalOfdParams" ofd.AdditionalOfdParams extra data (for OFD 1.05 and up)
 // "Features" used in some endpoints of API
 // "JSONParams" different json data that can be stored on api side
 type Order struct {
@@ -45,7 +46,7 @@ type Order struct {
 	ExpirationDate      string
 	BindingID           string
 	OrderBundle         OrderBundle
-	AdditionalOfdParams AdditionalOfdParams
+	AdditionalOfdParams ofd.AdditionalOfdParams
 	Features            string
 	JSONParams          map[string]string
 }
@@ -56,39 +57,6 @@ func (order Order) Validate() error {
 		validation.Field(&order.OrderNumber, validation.Required, validation.Length(1, 30)),
 		validation.Field(&order.FailURL, is.URL),
 	)
-}
-
-type AdditionalOfdParams struct {
-	AgentInfoType                   int      `json:"agent_info.type"`
-	AgentInfoPayingOperation        string   `json:"agent_info.paying.operation,omitempty"`
-	AgentInfoPayingPhones           []string `json:"agent_info.paying.phones,omitempty"`
-	AgentInfoPaymentsOperatorPhones []string `json:"agent_info.paymentsOperator.phones,omitempty"`
-	AgentInfoMTOperatorAddress      string   `json:"agent_info.MTOperator.address,omitempty"`
-	AgentInfoMTOperatorInn          string   `json:"agent_info.MTOperator.inn,omitempty"`
-	AgentInfoMTOperatorName         string   `json:"agent_info.MTOperator.name,omitempty"`
-	AgentInfoMTOperatorPhones       []string `json:"agent_info.MTOperator.phones,omitempty"`
-	SupplierInfoPhones              []string `json:"supplier_info.phones,omitempty"`
-	Cashier                         string   `json:"cashier,omitempty"`
-	AdditionalCheckProps            string   `json:"additional_check_props,omitempty"`
-	AdditionalUserPropsName         string   `json:"additional_user_props.name,omitempty"`
-	AdditionalUserPropsValue        string   `json:"additional_user_props.value,omitempty"`
-	CashierInn                      string   `json:"cashier_inn,omitempty"`
-	ClientAddress                   string   `json:"client.address,omitempty"`
-	ClientBirthDate                 string   `json:"client.birth_date,omitempty"`
-	ClientCitizenship               string   `json:"client.citizenship,omitempty"`
-	ClientDocumentCode              string   `json:"client.document_code,omitempty"`
-	ClientPassportNumber            string   `json:"client.passport_number,omitempty"`
-	ClientMail                      string   `json:"client.email,omitempty"`
-	ClientPhone                     string   `json:"client.phone,omitempty"`
-	ClientInn                       string   `json:"client.inn,omitempty"`
-	ClientName                      string   `json:"client.name,omitempty"`
-	OperatingCheckPropsName         string   `json:"operatingCheckProps.name,omitempty"`
-	OperatingCheckPropsTimestamp    string   `json:"operatingCheckProps.timestamp,omitempty"`
-	OperatingCheckPropsValue        string   `json:"operatingCheckProps.value,omitempty"`
-	SectoralCheckPropsDate          string   `json:"sectoralCheckProps.date,omitempty"`
-	SectoralCheckPropsFederalId     string   `json:"sectoralCheckProps.federalId,omitempty"`
-	SectoralCheckPropsNumber        string   `json:"sectoralCheckProps.number,omitempty"`
-	SectoralCheckPropsValue         string   `json:"sectoralCheckProps.value,omitempty"`
 }
 
 type OrderBundle struct {
