@@ -66,13 +66,12 @@ func (c Client) ProcessRawSumRefund(ctx context.Context, processRawSumRefundRequ
 		"userName": processRawSumRefundRequest.UserName,
 		"password": processRawSumRefundRequest.Password,
 		"amount":   strconv.FormatInt(processRawSumRefundRequest.Amount, 10),
+		"language": processRawSumRefundRequest.Language,
+		"orderId":  processRawSumRefundRequest.OrderId,
+		"name":     processRawSumRefundRequest.Name,
+		"itemCode": processRawSumRefundRequest.ItemCode,
+		"taxType":  strconv.Itoa(processRawSumRefundRequest.TaxType),
 	}
-	body["language"] = processRawSumRefundRequest.Language
-	body["orderId"] = processRawSumRefundRequest.OrderId
-	body["amount"] = strconv.FormatInt(processRawSumRefundRequest.Amount, 10)
-	body["name"] = processRawSumRefundRequest.Name
-	body["itemCode"] = processRawSumRefundRequest.ItemCode
-	body["taxType"] = strconv.Itoa(processRawSumRefundRequest.TaxType)
 
 	if processRawSumRefundRequest.JSONParams != nil {
 		body["jsonParams"] = string(jsonParams)
