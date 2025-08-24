@@ -11,3 +11,9 @@ type InstantRefundResponse struct {
 	ApprovalCode string `json:"approvalCode"` // Код авторизации МПС
 	RRN          string `json:"rrn"`          // Reference Retrieval Number
 }
+
+// ProcessRawSumRefundResponse — структура ответа от метода processRawSumRefund.do
+type ProcessRawSumRefundResponse struct {
+	ErrorCode    int    `json:"errorCode,string"`    // Код ошибки
+	ErrorMessage string `json:"errorMessage,string"` // Описание ошибки
+}
