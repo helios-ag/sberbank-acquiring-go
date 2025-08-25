@@ -1,4 +1,4 @@
-package raw_sum_refund
+package raw_position_refund
 
 import (
 	"context"
@@ -48,36 +48,36 @@ func TestClient_RawSumRefund(t *testing.T) {
 		prepareClient(newServer.URL)
 
 		OrderId := "9231a838-ac68-4a3e"
-		refundRequest := ProcessRawSumRefundRequest{
+		refundRequest := ProcessRawPositionRefundRequest{
 			OrderId:  OrderId,
 			UserName: "user",
 			Password: "password",
 			Amount:   0,
 		}
 
-		_, _, err := ProcessRawSumRefund(context.Background(), refundRequest)
+		_, _, err := ProcessRawPositionRefund(context.Background(), refundRequest)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("Amount: cannot be blank."))
 		OrderId = "9231a838-ac68-4a3e-ac68-4a3e-ac68-4a3e-ac68-4a3e-ac68-4a3e-ac68-4a3e"
-		refundRequest = ProcessRawSumRefundRequest{
+		refundRequest = ProcessRawPositionRefundRequest{
 			UserName: "user",
 			Password: "password",
 			OrderId:  OrderId,
 			Amount:   1,
 		}
 
-		_, _, err = ProcessRawSumRefund(context.Background(), refundRequest)
+		_, _, err = ProcessRawPositionRefund(context.Background(), refundRequest)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("OrderId: the length must be between 1 and 30."))
 
-		refundRequest = ProcessRawSumRefundRequest{
+		refundRequest = ProcessRawPositionRefundRequest{
 			UserName: "user",
 			Password: "password",
 			OrderId:  "",
 			Amount:   1,
 		}
 
-		_, _, err = ProcessRawSumRefund(context.Background(), refundRequest)
+		_, _, err = ProcessRawPositionRefund(context.Background(), refundRequest)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("OrderId: cannot be blank."))
 	})
@@ -87,7 +87,7 @@ func TestClient_RawSumRefund(t *testing.T) {
 		defer newServer.Teardown()
 		prepareClient(newServer.URL)
 
-		newServer.Mux.HandleFunc(endpoints.ProcessRawSumRefund, func(w http.ResponseWriter, r *http.Request) {
+		newServer.Mux.HandleFunc(endpoints.ProcessRawPositionRefund, func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(schema.ProcessRawRefundResponse{
@@ -96,14 +96,14 @@ func TestClient_RawSumRefund(t *testing.T) {
 			})
 		})
 		OrderId := "9231a838-ac68-4a3e"
-		request := ProcessRawSumRefundRequest{
+		request := ProcessRawPositionRefundRequest{
 			UserName: "user",
 			Password: "password",
 			OrderId:  OrderId,
 			Amount:   1,
 		}
 
-		response, _, err := ProcessRawSumRefund(context.Background(), request)
+		response, _, err := ProcessRawPositionRefund(context.Background(), request)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response).To(PointTo(MatchFields(IgnoreExtras, Fields{
 			"ErrorCode":    Equal(0),
@@ -117,13 +117,13 @@ func TestClient_RawSumRefund(t *testing.T) {
 		prepareClient(newServer.URL)
 
 		OrderId := "9231a838-ac68-4a3e"
-		request := ProcessRawSumRefundRequest{
+		request := ProcessRawPositionRefundRequest{
 			OrderId:  OrderId,
 			UserName: "user",
 			Password: "password",
 			Amount:   1,
 		}
-		_, _, err := ProcessRawSumRefund(context.Background(), request)
+		_, _, err := ProcessRawPositionRefund(context.Background(), request)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("404"))
 	})
@@ -139,11 +139,11 @@ func TestClient_RawSumRefund(t *testing.T) {
 
 		OrderId := "9231a838-ac68-4a3e"
 
-		request := ProcessRawSumRefundRequest{
+		request := ProcessRawPositionRefundRequest{
 			OrderId: OrderId,
 			Amount:  1,
 		}
-		_, _, err := ProcessRawSumRefund(context.Background(), request)
+		_, _, err := ProcessRawPositionRefund(context.Background(), request)
 		Expect(err).To(HaveOccurred())
 	})
 
@@ -152,17 +152,17 @@ func TestClient_RawSumRefund(t *testing.T) {
 		defer newServer.Teardown()
 		prepareClient(newServer.URL)
 
-		newServer.Mux.HandleFunc(endpoints.ProcessRawSumRefund, func(w http.ResponseWriter, r *http.Request) {
+		newServer.Mux.HandleFunc(endpoints.ProcessRawPositionRefund, func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		})
 		OrderId := "9231a838-ac68-4a3e"
 
-		request := ProcessRawSumRefundRequest{
+		request := ProcessRawPositionRefundRequest{
 			OrderId: OrderId,
 			Amount:  1,
 		}
 
-		_, _, err := ProcessRawSumRefund(context.Background(), request)
+		_, _, err := ProcessRawPositionRefund(context.Background(), request)
 		// We don't care what underlying error happened
 		Expect(err).To(HaveOccurred())
 	})

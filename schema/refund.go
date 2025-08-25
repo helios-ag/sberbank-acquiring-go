@@ -12,8 +12,8 @@ type InstantRefundResponse struct {
 	RRN          string `json:"rrn"`          // Reference Retrieval Number
 }
 
-// ProcessRawSumRefundResponse — структура ответа от метода processRawSumRefund.do
-type ProcessRawSumRefundResponse struct {
+// ProcessRawRefundResponse — структура ответа от метода processRawSumRefund.do
+type ProcessRawRefundResponse struct {
 	ErrorCode    int    `json:"errorCode,string"`    // Код ошибки
 	ErrorMessage string `json:"errorMessage,string"` // Описание ошибки
 }
