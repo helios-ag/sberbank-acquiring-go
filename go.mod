@@ -1,6 +1,6 @@
 module github.com/helios-ag/sberbank-acquiring-go
 
-go 1.25.0
+go 1.27
 
 require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
