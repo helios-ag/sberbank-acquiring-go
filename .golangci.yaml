@@ -1,5 +1,8 @@
-issues:
-  exclude-rules:
-    - path: _test\.go # disable some linters on test files
-      linters:
-        - errcheck
+version: "2"
+
+linters:
+  exclusions:
+    rules:
+      - path: _test\.go # disable some linters on test files
+        linters:
+          - errcheck

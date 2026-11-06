@@ -179,10 +179,10 @@ func (c *Client) Do(r *http.Request, v interface{}) (*http.Response, error) {
 
 	body, err := reader(resp.Body)
 	if err != nil {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return resp, err
 	}
-	resp.Body.Close()
+	_ = resp.Body.Close()
 	resp.Body = io.NopCloser(bytes.NewReader(body))
 
 	if resp.StatusCode >= 400 && resp.StatusCode <= 599 {
