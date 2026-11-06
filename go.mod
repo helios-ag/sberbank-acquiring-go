@@ -3,7 +3,7 @@ module github.com/helios-ag/sberbank-acquiring-go
 go 1.27
 
 require (
-	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/go-ozzo/ozzo-validation/v4 v4.5.0
 	github.com/onsi/gomega v1.44.0
 )
 
@@ -13,5 +13,4 @@ require (
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
